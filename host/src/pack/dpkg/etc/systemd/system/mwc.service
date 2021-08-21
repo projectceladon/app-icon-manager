@@ -1,0 +1,14 @@
+[Unit]
+Description=/etc/rc.mwc service
+ConditionPathExists=/etc/rc.mwc
+ 
+[Service]
+Type=simple
+ExecStart=/etc/rc.mwc start
+TimeoutSec=0
+StandardOutput=tty
+RemainAfterExit=yes
+SysVStartPriority=99
+ 
+[Install]
+WantedBy=multi-user.target

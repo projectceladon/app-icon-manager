@@ -1,0 +1,14 @@
+[Unit]
+Description=Intel Clipboard Service
+After=home.mount lightdm.service
+ 
+[Service]
+Type=simple
+ExecStart=/etc/clipboard.sh start
+TimeoutSec=0
+RemainAfterExit=yes
+Restart=always
+RestartSec=3
+ 
+[Install]
+WantedBy=default.target

@@ -1,0 +1,17 @@
+#!/bin/sh -e
+CIV_PATH=
+
+TEMP_LOG=/tmp/civ.log
+
+echo -e "Start CIV daemon service ..." > $TEMP_LOG
+if [ -d $CIV_PATH ]
+then
+   vm-manager -b penguin-peak >> $TEMP_LOG &
+   sleep 60
+   ${CIV_PATH}/scripts/stream >> $TEMP_LOG
+else
+   echo "CIV instllation path is empty, skip!" >> $TEMP_LOG
+   exit 1
+fi
+
+exit 0

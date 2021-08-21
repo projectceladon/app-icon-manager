@@ -1,0 +1,8 @@
+KERNEL=="renderD128", SUBSYSTEM=="drm", MODE="0666"
+KERNEL=="uinput", SUBSYSTEM=="misc", MODE="0666"
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{name}=="input-looking-glass0", MODE="0666", SYMLINK+="input/by-id/input-looking-glass0"
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{name}=="input-looking-glass1", MODE="0666", SYMLINK+="input/by-id/input-looking-glass1"
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{name}=="input-looking-glass2", MODE="0666", SYMLINK+="input/by-id/input-looking-glass2"
+KERNEL=="event*", SUBSYSTEM=="input", ATTRS{name}=="input-looking-glass3", MODE="0666", SYMLINK+="input/by-id/input-looking-glass3"
+KERNEL=="vhost-vsock", SUBSYSTEM=="misc", MODE="0666"
+KERNEL=="kvm", SUBSYSTEM=="misc", MODE="0666"

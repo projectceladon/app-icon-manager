@@ -1,0 +1,10 @@
+Package: cfc
+Version: 0.1.0
+Section: System
+Priority: optional
+Architecture: amd64
+Depends: libgles2, libegl1, libegl1, libxfixes3, libc6, libcairo2
+Installed-Size: 5000
+Maintainer: CIV PegnuinPeak host side service
+Description: CIV PenguinPeak host side service
+    support lunch Android app via host side desktop app lunch icon.

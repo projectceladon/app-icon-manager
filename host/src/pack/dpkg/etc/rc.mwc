@@ -1,0 +1,17 @@
+#!/bin/sh -e
+
+echo "Configure the LG node & permissions..." >/opt/cfc/mwc.log
+for i in 0 1 2 3
+do
+    if [ ! -f /dev/shm/looking-glass$i ]
+    then
+	echo "/dev/shm/looking-glass$i doesn't exit, create it."
+	touch /dev/shm/looking-glass$i
+    fi
+    chown root:kvm /dev/shm/looking-glass$i
+    chmod 666 /dev/shm/looking-glass$i
+done
+
+echo "Start mwc daemon service ..." >> /opt/cfc/mwc.log
+/opt/cfc/mwc/bin/mwc_hostdaemon 3000 >> /opt/cfc/mwc.log
+exit 0
