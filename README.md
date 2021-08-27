@@ -1,4 +1,4 @@
-# PenguinPeak App Icon Manager responsible for Android App launch icon creation/removal and support lunching Android App from Host OS side
+# App Icon Manager responsible for Android App launch icon creation/remova in host OS desktop and support lunching Android App running in Android VM guest from Host OS.
 
 Install App Icon Manager .deb package
 
@@ -13,10 +13,19 @@ Note: The mwc.service will be started automatically at boot time.
 
 Create the host side app launch icons
 
-1. Run terminal in normal user which current holds ubuntu desktop session
+1. Run terminal in normal user which currently holds ubuntu desktop session
 Please ensure CIV instance has been started already.
 /opt/cfc/mwc/bin/mwc create-shortcut
-If thing goes well, you should be able to see some .desktop files created under folder ~/applications/
+If thing goes well, you should be able to see some .desktop files created under folder ~/applications/. For ubuntu, just copy this folder ~/.local/share. The new created app lunch icons will be present in Ubuntu app launcher automatically then.
 
 2 create .desktop file for given app, example org.videolan.vlc
 /opt/cfc/mwc/bin/mwc create-shortcut org.videolan.vlc
+
+3. Post processing for Kylin OS adaptation
+/opt/cfc/mwc/bin/update_lunch_pg.sh
+3.1 Update .desktop file of given app only (ex org.videolan.vlc)
+/opt/cfc/mwc/bin/update_lunch_pg.sh org.videolan.vlc
+
+Package building
+To be done.
+
