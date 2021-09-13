@@ -31,6 +31,8 @@ Date: 2021.04.27
 #include "lgclient.h"
 #include "common.h"
 
+#include "AdbProxy.h"
+
 int main(int argc, char **argv)
 {
 
@@ -68,7 +70,31 @@ int main(int argc, char **argv)
 
         delete client;
     } else {
-	printf ("Unknown arguments, argv[3]:%s, argc:%d\n", argv[3], argc);
+	if (strstr("CLOSEAPP_LASTOPENED", argv[3]) != 0) {
+            int port = atoi (lg_daemon_port);
+
+            LGClient* client = new LGClient();
+
+            client->setEndMode (MODE_AUTOEXIT);
+            client->setCliCommParams (lg_daemon_server, port);
+            client->Init();
+	    // for daemon service to update launched app record.
+            ret = client->closeAppLastOpened();
+            if (ret >=0 ) {
+	        // appname is same with pkgname right now.
+	        char* appname = client->getAppName();
+	        char* activity = client->getActivityName();
+                // close the app
+	        AdbProxy* adb_proxy = AdbProxy().getInstance();
+	        adb_proxy->closeActivity(appname);
+	    }
+	    ret = client->getResult();
+	    client->Destroy();
+	    delete client;
+	}
+	else {
+	    printf ("Unknown arguments, argv[3]:%s, argc:%d\n", argv[3], argc);
+	}
     }
 
     exit(ret);

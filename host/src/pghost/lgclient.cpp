@@ -103,6 +103,9 @@ int LGClient::connectToVatClient()
 
 void LGClient::Destroy()
 {
+    if (!release_res) {
+	ReleaseRes();
+    }
     if (m_thread_created) {
 	pthread_join(m_execlg, NULL);
     }
@@ -226,6 +229,20 @@ int LGClient::closeApp()
 
 }
 
+int LGClient::closeAppLastOpened()
+{
+    running = 1;
+    char lgmsg_body[256];
+    snprintf (lgmsg_body, sizeof(lgmsg_body), "{lg_instance_id=%s;}", lg_instance_id);
+
+    char msg_body[512];
+    compose_msg_body(msg_body, sizeof(msg_body), EVENT_REQ_CLOSE_APP_LAST_OPENED, lgmsg_body);
+    m_connmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+    mainLoop();
+
+    return result;
+}
+
 int LGClient::HandleEvent(Event* event)
 {
     // Handle event here.
@@ -303,6 +320,26 @@ int LGClient::HandleEvent(Event* event)
 	    running = 0;
 	    result = 0;
 	    break;
+	case EVENT_RES_CLOSE_APP_LAST_OPENED:
+            get_key_value (event->event_data + 1,
+                           (char*) "appname",
+                           m_appname,
+                           (char*) "=",
+                           (char*) ",");
+	    // make the pkgname same as appname.
+	    snprintf(m_pkgname, sizeof(m_pkgname), "%s", m_appname);
+	    get_key_value (event->event_data + 1,
+                           (char*) "activity",
+                           m_activity,
+                           (char*) "=",
+                           (char*) ",");
+	    //release_res = false;
+	    running = 0;
+	    result = 0;
+	    break;
+	case EVENT_RES_NO_APP_LAST_OPENED:
+	    running = 0;
+	    result = -1;
 	default:
 	    break;
     }
@@ -313,6 +350,30 @@ int LGClient::HandleEvent(Event* event)
     }
 
     return 0;
+}
+
+char* LGClient::getAppName()
+{
+    return m_appname;
+}
+
+char* LGClient::getActivityName()
+{
+    return m_activity;
+}
+
+
+void LGClient::ReleaseRes()
+{
+    m_connmgr->connDown();
+    delete m_connmgr;
+    m_connmgr = NULL;
+    close (m_sock);
+    m_sock = -1;
+
+    delete m_event_queue;
+    m_event_queue = NULL;
+
 }
 
 int LGClient::mainLoop()
@@ -338,14 +399,10 @@ int LGClient::mainLoop()
 	}
 
     }
-    m_connmgr->connDown();
-    delete m_connmgr;
-    m_connmgr = NULL;
-    close (m_sock);
-    m_sock = -1; 
 
-    delete m_event_queue;
-    m_event_queue = NULL;
+    if (release_res) {
+        ReleaseRes();
+    }
 
     return 0;
 }

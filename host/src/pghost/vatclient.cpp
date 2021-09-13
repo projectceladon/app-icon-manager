@@ -167,6 +167,8 @@ int VatClient::HandleEventSingleLG(Event* event)
 
     char lgslot_body[64];
     char app_close_body[256];
+    char app_last_opened[256];
+
     switch (event->event_type)
     {
 	case EVENT_REQ_CHECK_IF_APP_LAUNCHED:
@@ -197,6 +199,9 @@ int VatClient::HandleEventSingleLG(Event* event)
 	    m_activity = activity;
 	    m_appname = appname;
 
+	    m_lg_slots[0]->slot_status = LGSLOT_USED;
+	    snprintf(m_lg_slots[0]->appname, sizeof(m_lg_slots[0]->appname), "%s", appname);
+	    snprintf(m_lg_slots[0]->activity, sizeof(m_lg_slots[0]->activity), "%s", activity);
 	    break;
 	case EVENT_REQ_APP_CLOSE_BY_APPNAME:
 	    {
@@ -217,6 +222,24 @@ int VatClient::HandleEventSingleLG(Event* event)
             EnQueueGlobalEvt (msg_body);
 	    running = 0;
 	    break;
+
+	case EVENT_REQ_CLOSE_APP_LAST_OPENED:
+	    if (m_lg_slots[0]->slot_status != LGSLOT_USED) {
+                snprintf(app_last_opened, sizeof(app_last_opened), "{lg_instance_id=%d;};", -1);
+                compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_NO_APP_LAST_OPENED, app_last_opened);
+                m_launcherconnmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+	    }
+	    else {
+                snprintf(app_last_opened, sizeof(app_last_opened), "{appname=%s,activity=%s,};", m_lg_slots[0]->appname, m_lg_slots[0]->activity);
+                compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_CLOSE_APP_LAST_OPENED, app_last_opened);
+                m_launcherconnmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+                // Compose the global message.
+                snprintf(app_close_body, sizeof(app_close_body), "{appname=%s,lg_instance_id=%d,};", m_lg_slots[0]->appname, 0);
+                compose_msg_body(msg_body, sizeof(msg_body), EVENT_NOTIFY_APP_CLOSE_BY_APPNAME, app_close_body);
+                EnQueueGlobalEvt (msg_body);
+	    }
+            running = 0;
+            break;
 
 	case EVENT_NOTIFY_LG_APP_CLOSED:
 	    running = 0;
