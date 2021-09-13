@@ -57,6 +57,12 @@ typedef struct global_data_s {
 static global_data_t g_data;
 pthread_t    p_event_loop     = 0;
 
+#ifdef LG_SINGLE_MODE
+lgslot_t*    g_lg_slots[1];
+#else
+lgslot_t*    g_lg_slots[4];
+#endif
+
 extern int get_key_value (char* src, char* key, char* ret_buf, char* kv_separtor, char* key_separator);
 #ifdef LG_SINGLE_MODE
 static int HandleEvent(global_data_t* gdata, Event* event) {
@@ -76,6 +82,11 @@ static int HandleEvent(global_data_t* gdata, Event* event) {
                 {
 		    VatClient* vatclient = it->second;
 		    if (strstr(vatclient->getAppname(),appname)) {
+			if (strstr(g_lg_slots[0]->appname, appname) && g_lg_slots[0]->slot_status != LGSLOT_IDLE) {
+			    g_lg_slots[0]->slot_status = LGSLOT_IDLE;
+			    memset(g_lg_slots[0]->appname, sizeof(g_lg_slots[0]->appname), 0);
+			    memset(g_lg_slots[0]->activity, sizeof(g_lg_slots[0]->activity), 0);
+			}
                         vatclient->Close();
 			break;
 		    }
@@ -165,11 +176,6 @@ static int set_socket_nb(int fd_socket)
 
     return 0;
 }
-#ifdef LG_SINGLE_MODE
-lgslot_t*    g_lg_slots[1];
-#else
-lgslot_t*    g_lg_slots[4];
-#endif
 
 int main (int argc, char **argv)
 {

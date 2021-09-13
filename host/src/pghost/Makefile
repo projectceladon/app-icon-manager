@@ -26,7 +26,7 @@ MWCLAUNCHERSRCS = vatlauncher.cpp lgclient.cpp connfactory.cpp connmgr.cpp event
           connsock.cpp utils.cpp ShortcutMgrLg.cpp Log.cpp AdbProxy.cpp
 
 MSG_AGENTSRCS = msg_agent.cpp lgclient.cpp connfactory.cpp connmgr.cpp eventqueue.cpp \
-          connsock.cpp utils.cpp
+          connsock.cpp utils.cpp AdbProxy.cpp Log.cpp
 
 MWCSRC = mwc_main.cpp ShortcutMgrLg.cpp Log.cpp AdbProxy.cpp
 

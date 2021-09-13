@@ -48,6 +48,10 @@ class LGClient
 	// send the close app message to daemon and let the daemon
 	// to notify the registered client.
 	int closeApp();
+	int closeAppLastOpened();
+	char* getAppName();
+	char* getActivityName();
+
         int Launch();
         void setCliCommParams(char* client, int port);
         int getResult();
@@ -75,6 +79,8 @@ class LGClient
 	char     m_appname[512];
 	char     m_pkgname[512];
         int      m_exec_mode        = 0;
+	volatile bool release_res   = true;
+	void     ReleaseRes();
 };
 
 #endif
