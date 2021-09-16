@@ -27,5 +27,22 @@ If thing goes well, you should be able to see some .desktop files created under 
 /opt/cfc/mwc/bin/update_lunch_pg.sh org.videolan.vlc
 
 Package building
-To be done.
 
+The build steps are based on Ubuntu 18.04 desktop
+1. Install the build dependencies
+apt-get install git make cmake build-essential clang libjsoncpp-dev
+
+2. clone the source
+git clone https://github.com/projectceladon/app-icon-manager.git
+
+3. build out the binaries
+cd app-icon-manager/host/src/pghost
+# Build out the binary files
+make
+cd ../pack
+./pack.sh
+# Move the deb file to the bins folder
+mv cfc-0.1.0-x64.deb ../../bins
+cd ../pghost
+# clean out the intermediate build outs
+make clean
