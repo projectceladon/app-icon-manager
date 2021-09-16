@@ -26,7 +26,7 @@ then
     echo "Processing app lunch file for kylin: $lunch_file"
     sed -i "s%^Exec=\/%Exec=sh -- \/%g" $lunch_file
     echo "Copy app .desktop file: $lunch_file to /usr/share/applications/ folder."
-    sudo cp "$lunch_file" /usr/share/applications/
+    #sudo cp "$lunch_file" /usr/share/applications/
     cd -
     echo "Start to update desktop app list for Kylin OS ..."
     desktop_applist_file=${HOME}/.config/ukui/desktop_applist
@@ -50,7 +50,7 @@ else
 
   done
   echo "Copy app .desktop files to /usr/share/applications/ folder..."
-  sudo cp *.desktop /usr/share/applications/
+  #sudo cp *.desktop /usr/share/applications/
   cd -
 
   echo "Start to update desktop app list for Kylin OS ..."
