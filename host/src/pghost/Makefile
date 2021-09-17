@@ -2,7 +2,7 @@ CC = g++ -fpermissive -I/usr/include/jsoncpp -DLG_SINGLE_MODE
 #CC_FLAGS = -g -Wall -lpthread -lsqlite3
 CC_FLAGS = -g -Wall -lpthread -fPIC  -ljsoncpp -I/usr/include/jsoncpp
 #CC_FLAGS_CD = -g -Wall -lpthread -lX11 -ljpeg -I. -I/usr/include/libpng12 -ljpeg -lpng12
-CC_FLAGS_CD = -g -Wall -lpthread -lX11 -ljpeg -I. -I/usr/include/libpng12 -ljpeg -lpng16
+CC_FLAGS_CD = -g -Wall -lpthread -I.
 #CC_FLAGS_CD = -g -Wall -lpthread -lX11 -ljpeg -I. -I/usr/include/libpng12 -ljpeg
 
 CC_FLAGS_MWC = -fPIC -fno-exceptions -Wno-deprecated  -DOS_UBUNTU=1 -ljsoncpp -I/usr/include/jsoncpp
