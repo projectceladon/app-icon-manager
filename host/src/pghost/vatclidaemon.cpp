@@ -72,8 +72,9 @@ static int HandleEvent(global_data_t* gdata, Event* event) {
     switch (event->event_type)
     {
         case EVENT_NOTIFY_APP_CLOSE_BY_APPNAME:
-	    std::map<int, VatClient*>::iterator it = gdata->clients->begin();
-            get_key_value (event->event_data + 1,
+            {
+                std::map<int, VatClient*>::iterator it = gdata->clients->begin();
+                get_key_value (event->event_data + 1,
                            (char*) "appname",
                            appname,
                            (char*) "=",
@@ -92,6 +93,7 @@ static int HandleEvent(global_data_t* gdata, Event* event) {
 		    }
 		    it++;
 	        }
+            }
             break;
 	default:
             break;
