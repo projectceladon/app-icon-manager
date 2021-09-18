@@ -1,13 +1,28 @@
 #!/bin/sh -e
-CIV_PATH=
+CIV_PATH=/opt/civ/data/Release_Deb
 
-TEMP_LOG=/tmp/civ.log
+TEMP_LOG=$HOME/.civ.log
 
 echo -e "Start CIV daemon service ..." > $TEMP_LOG
 if [ -d $CIV_PATH ]
 then
+   if [ ! -d $HOME/.userdata ]
+   then
+       mkdir -p $HOME/.userdata/
+       cp $CIV_PATH/userdata/civ_userdata.img $HOME/.userdata/${USER}.img
+   fi
+
+   if [ ! -f $HOME/.intel/.civ/penguin-peak.ini ]
+   then
+       mkdir -p $HOME/.intel/.civ/
+       cp /opt/cfc/mwc/bin/penguin-peak.ini $HOME/.intel/.civ/
+       sed -i "s%/home/kylin/civ/.userdata/username.img%${HOME}/.userdata/${USER}.img%g" $HOME/.intel/.civ/penguin-peak.ini
+       mkdir -p $HOME/civshare
+       sed -i "s%/home/kylin/civ/hostshare%${HOME}/civshare%g" $HOME/.intel/.civ/penguin-peak.ini
+   fi
+
    vm-manager -b penguin-peak >> $TEMP_LOG &
-   sleep 60
+   sleep 10
    ${CIV_PATH}/scripts/stream >> $TEMP_LOG
 else
    echo "CIV instllation path is empty, skip!" >> $TEMP_LOG
