@@ -15,7 +15,7 @@ num_lg_insts=`ps aux | grep LG_B1_Client | grep -v guestClipboard.*enable.*true 
 if [[ "$num_lg_insts" -lt "1" ]];
 then
     #/opt/lg/bin/LG_B1_Client -M yes -R 16666 -f /dev/shm/looking-glass0 -a true -t $1
-    /opt/lg/bin/LG_B1_Client -M yes -R 16666 -f /dev/shm/looking-glass0 -a true -t "Education APP/教育应用"
+    /opt/lg/bin/LG_B1_Client -M yes -R 16666 -f /dev/shm/looking-glass0 -a true -t "安卓应用"
     /opt/cfc/mwc/bin/msg_agent localhost 3000 CLOSEAPP_LASTOPENED
 fi
 
