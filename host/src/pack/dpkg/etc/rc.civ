@@ -23,7 +23,7 @@ then
 
    vm-manager -b penguin-peak >> $TEMP_LOG &
    sleep 10
-   ${CIV_PATH}/scripts/stream >> $TEMP_LOG
+   ${CIV_PATH}/scripts/stream >> $TEMP_LOG &
 else
    echo "CIV instllation path is empty, skip!" >> $TEMP_LOG
    exit 1

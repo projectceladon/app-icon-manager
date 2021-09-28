@@ -10,5 +10,8 @@ do
     fi
 done
 
-/opt/lg/bin/LG_B1_Client guestClipboard:enable=true 
+/bin/sh -e /etc/rc.civ start
+sleep 10
+
+/opt/lg/bin/LG_B1_Client guestClipboard:enable=true
 exit 0
