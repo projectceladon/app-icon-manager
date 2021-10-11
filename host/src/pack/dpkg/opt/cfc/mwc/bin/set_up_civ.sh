@@ -97,16 +97,12 @@ function stop_civ_services() {
 	systemctl --user daemon-reload
 	systemctl --user stop civ
 	systemctl --user disable civ
-	systemctl --user stop clipboard
-	sudo systemctl --global disable clipboard
 }
 
 function start_civ_services() {
 	systemctl --user daemon-reload
 	systemctl --user enable civ
-	sudo systemctl --global enable clipboard
 	systemctl --user start civ
-	systemctl --user start clipboard
 }
 
 function wait_civ_adb_connect() {
