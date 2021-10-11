@@ -61,13 +61,15 @@ int main(int argc, char **argv)
     client->setActivity (activity);
 
     client->setCliCommParams (lg_daemon_server, port);
-    client->Init();
-    client->Launch();
-
-    ret = client->getResult();
-
-    printf ("The LG Launch result is %d\n", ret);
-
+    ret = client->Init();
+    if (ret >=0) {
+        client->Launch();
+        ret = client->getResult();
+        printf ("The LG Launch result is %d\n", ret);
+    }
+    else {
+        printf ("The client initialize failed, skip!\n");
+    }
     client->Destroy();
 
     delete client;
