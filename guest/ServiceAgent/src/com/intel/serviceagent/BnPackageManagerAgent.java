@@ -37,6 +37,10 @@ import android.graphics.drawable.Drawable;
 import android.os.RemoteException;
 import android.util.Log;
 
+import android.util.DisplayMetrics;
+import android.content.res.Resources;
+
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -192,10 +196,26 @@ public class BnPackageManagerAgent extends IPackageManagerAgent.Stub {
         Log.d(TAG, "getApplicationIcon");
 
         try {
-            Drawable applicationIcon = mPm.getApplicationIcon(pkg);
+
+            ApplicationInfo appInfo =
+                mPm.getApplicationInfo(pkg, PackageManager.GET_META_DATA);
+            Resources res = mPm.getResourcesForApplication(appInfo);
+            Drawable applicationIcon;
+            try {
+                applicationIcon = res.getDrawableForDensity(appInfo.icon, DisplayMetrics.DENSITY_XHIGH, null);
+            } catch (Resources.NotFoundException e) {
+                Log.d(TAG, "getDrawableForDensity for: " + pkg + " raised Resource not found exception, try to call Packagemanger getApplicationIcon!");
+                applicationIcon = mPm.getApplicationIcon(pkg);
+            }
+
             Bitmap bm = drawableToBitmap(applicationIcon);
+
+            // Use the fixed size 96*96 icon
+            // TODO make it user configurable.
+            Bitmap resized_bm = Bitmap.createScaledBitmap(bm, 96, 96, true);
+
             ByteArrayOutputStream os = new ByteArrayOutputStream();
-            bm.compress(Bitmap.CompressFormat.PNG, 100, os);
+            resized_bm.compress(Bitmap.CompressFormat.PNG, 100, os);
             byte[] data = os.toByteArray();
 
             if (DEBUG) {
