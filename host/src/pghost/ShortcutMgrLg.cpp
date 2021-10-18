@@ -275,6 +275,57 @@ const char* ShortcutMgrLg::getInstalledApps()
 
 }
 
+const char* ShortcutMgrLg::getInstalledAppsV1()
+{
+    m_adbproxy_->runShellCmd("/system/bin/pm_agent_client dump-v1-apps");
+
+    char filepath[256];
+    const char* home;
+
+    mInstalledAppsV1 = "[";
+    home = getenv("HOME");
+    if (home) {
+	snprintf(filepath, sizeof(filepath), "%s/.installed_apps_v1.json", home);
+	char cmdbuf[512];
+	snprintf(cmdbuf, sizeof(cmdbuf), "adb pull /sdcard/installed_apps_v1.json %s", filepath);
+	system(cmdbuf);
+	Json::Value root;
+	std::ifstream ifs;
+	ifs.open(filepath);
+	Json::CharReaderBuilder builder;
+	builder["collectComments"] = true;
+	JSONCPP_STRING errs;
+	if (!parseFromStream(builder, ifs, &root, &errs)) {
+	    std::cout << errs << std::endl;
+	}
+	const Json::Value apps = root["apps"];
+	std::string intent;
+	std::string name;
+	std::string version;
+	int64_t apksize;
+	//std::string label;
+	for (unsigned int i = 0; i < apps.size(); i++) {
+	    intent = apps[i]["Intent"].asString();
+	    name = apps[i]["Name"].asString();
+	    version = apps[i]["Version"].asString();
+	    apksize = apps[i]["ApkSize"].asInt64();
+	    //label = apps[i]["AppLabel"].asString();
+	    m_app_intent_map[name] = intent;
+	    if ( 0 != i) {
+		mInstalledAppsV1 += ", ";
+	    }
+	    char app_str[512];
+	    snprintf(app_str, sizeof(app_str), "{\"appname\":\"%s\",\"package_name\":\"%s\",\"size\":%ld,\"version\":\"%s\"}", name.c_str(), name.c_str(), apksize, version.c_str());
+            mInstalledAppsV1 += app_str;
+	}
+    }
+
+    mInstalledAppsV1 += "]";
+
+    return mInstalledAppsV1.c_str();
+
+}
+
 bool ShortcutMgrLg::uninstallApp(const char* pkg) {
     // uninstall the app via adb
     // refresh the installed app list

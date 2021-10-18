@@ -32,6 +32,10 @@ int main()
 
     char* installed_apps = get_installed_applist();
     printf("installed_apps: %s\n", installed_apps);
+
+    char* installed_apps_v1 = get_installed_applist_v1();
+    printf("installed_apps v1: %s\n", installed_apps_v1);
+
     // for the apk to be installed, please change it to your file location
     ret = install_app("/home/kylin/VLC-Android-3.2.3-x86_64.apk", "vlc", "vlc");
     // for the app to be uninstalled, please change it to your app package name.
