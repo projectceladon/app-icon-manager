@@ -284,6 +284,93 @@ int dump_app_json_strs()
     return 0;
 }
 
+int dump_app_json_strs_v1()
+{
+    sp<IServiceAgent> s = AgentService::getAgentService();
+    sp<IPackageManagerAgent> pma;
+    sp<IPackageInstallerListener> listener = new PmListener();
+    sp<IClipboardAgent> cba;
+    sp<IHostSettingsListener> hostSettingsListener = new HostSettingsListener();
+
+    if (s != nullptr) {
+	binder::Status status;
+
+	status = s->getPackageManagerAgent(&pma);
+	if (!status.isOk()) {
+	    printf("Failed to call getPackageManagerAgent res=%s\n",
+		    status.toString8().string());
+	    return -1;
+	}
+
+	std::vector<::android::String16> pkgs;
+	status = pma->getPackageList(0, &pkgs);
+	if (!status.isOk()) {
+	    printf("Failed to call IPackageManagerAgent res=%s\n",
+		    status.toString8().string());
+	    return -1;
+	}
+	std::string finstalled_app_json = "/sdcard/installed_apps_v1.json";
+	FILE* fp = fopen(finstalled_app_json.c_str(), "wb");
+	if (fp == 0) {
+	    fprintf(stderr, "Failed to create json file %s:%s", finstalled_app_json.c_str(),
+		    strerror(errno));
+	    return -1;
+	}
+
+	bool first_line = true;
+	fprintf (fp, "{\n  \"apps\":\n  [\n");
+	for (auto& pkg : pkgs) {
+	    String16 intent;
+	    status = pma->getLaunchIntent(pkg, &intent);
+	    if (!status.isOk()) {
+		printf("Failed to call getLaunchIntent res=%s\n",
+			status.toString8().string());
+		return -1;
+	    }
+	    const char* slash = "/";
+	    if (!String8(intent).contains(slash)) {
+		continue;
+	    }
+
+	    if (!first_line) {
+		fprintf(fp, ",\n");
+	    }
+	    if (first_line) {
+		first_line = false;
+	    }
+            String16 appversion;
+	    status = pma->getAppVersion(pkg, &appversion);
+	    if (!status.isOk()) {
+		printf("Failed to call getAppVersion, res=%s\n",
+			status.toString8().string());
+		return -1;
+	    }
+            String16 appname;
+            status = pma->getAppName(pkg, &appname);
+            if (!status.isOk()) {
+		printf("Failed to call getAppName, res=%s\n",
+			status.toString8().string());
+		return -1;
+	    }
+            int64_t apksize;
+            status = pma->getApkSize(pkg, &apksize);
+            if (!status.isOk()) {
+                printf("Failed to call getApkSize, res=%s\n",
+                        status.toString8().string());
+                return -1;
+            }
+
+	    fprintf (fp, "      {\n          \"Name\":\"%s\",\n          \"Intent\":\"%s\",\n          \"Version\":\"%s\",\n          \"AppLabel\":\"%s\",\n          \"ApkSize\":%ld\n      }", String8(pkg).string(), String8(intent).string(), String8(appversion).string(), String8(appname).string(), apksize);
+	}
+	fprintf(fp, "\n  ]\n}\n");
+	fclose(fp);
+    } else {
+	printf("Failed to get servce\n");
+    }
+
+    return 0;
+}
+
 int main(int argc, char* argv[]) {
 
     int ret = 0;
@@ -293,6 +380,9 @@ int main(int argc, char* argv[]) {
 	if (params && !strcmp("dump-apps", params)) {
 	    ret = dump_app_json_strs();
 	}
+        else if (params && !strcmp("dump-v1-apps", params)) {
+            ret = dump_app_json_strs_v1();
+        }
     }
     else {
 	// dump the installed apps into .desktop files

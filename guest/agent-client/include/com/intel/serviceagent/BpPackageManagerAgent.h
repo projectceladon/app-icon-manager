@@ -23,6 +23,7 @@ public:
   ::android::binder::Status getAppName(const ::android::String16& pkg, ::android::String16* _aidl_return) override;
   ::android::binder::Status getAppVersion(const ::android::String16& pkg, ::android::String16* _aidl_return) override;
   ::android::binder::Status getIcon(const ::android::String16& pkg, ::std::vector<uint8_t>* _aidl_return) override;
+  ::android::binder::Status getApkSize(const ::android::String16& pkg, int64_t* _aidl_return) override;
 };  // class BpPackageManagerAgent
 
 }  // namespace serviceagent

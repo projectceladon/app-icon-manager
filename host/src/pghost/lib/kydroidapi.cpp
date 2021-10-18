@@ -112,6 +112,17 @@ char* get_installed_applist()
     return scMgr->getInstalledApps();
 }
 
+/*
+return the json string like below:
+[{"appname":"the app name","package_name":"the app package name","size":100000000,"version":"app version"}, {...}, ...]
+get_installed_applist_v1 is similar to get_installed_applist with some json fileds' renaming and added the size filed.
+*/
+char* get_installed_applist_v1()
+{
+    ShortcutMgrLg* scMgr = ShortcutMgrLg::getShortcutMgrLg();
+    return scMgr->getInstalledAppsV1();
+}
+
 bool is_android_env_installed()
 {
     // TODO: needs to check if Android guest installed or not.

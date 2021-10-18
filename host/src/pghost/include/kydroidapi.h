@@ -33,6 +33,8 @@ bool uninstall_app(char* pkgname);
 
 char* get_installed_applist();
 
+char* get_installed_applist_v1();
+
 bool is_android_env_installed();
 
 bool is_android_env_running();

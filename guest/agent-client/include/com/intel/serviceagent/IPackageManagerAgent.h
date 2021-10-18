@@ -26,6 +26,7 @@ public:
   virtual ::android::binder::Status getAppName(const ::android::String16& pkg, ::android::String16* _aidl_return) = 0;
   virtual ::android::binder::Status getAppVersion(const ::android::String16& pkg, ::android::String16* _aidl_return) = 0;
   virtual ::android::binder::Status getIcon(const ::android::String16& pkg, ::std::vector<uint8_t>* _aidl_return) = 0;
+  virtual ::android::binder::Status getApkSize(const ::android::String16& pkg, int64_t* _aidl_return) = 0;
 };  // class IPackageManagerAgent
 
 class IPackageManagerAgentDefault : public IPackageManagerAgent {
@@ -52,6 +53,9 @@ public:
     return ::android::binder::Status::fromStatusT(::android::UNKNOWN_TRANSACTION);
   }
   ::android::binder::Status getIcon(const ::android::String16&, ::std::vector<uint8_t>*) override {
+    return ::android::binder::Status::fromStatusT(::android::UNKNOWN_TRANSACTION);
+  }
+  ::android::binder::Status getApkSize(const ::android::String16&, int64_t*) override {
     return ::android::binder::Status::fromStatusT(::android::UNKNOWN_TRANSACTION);
   }
 };  // class IPackageManagerAgentDefault

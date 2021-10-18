@@ -50,6 +50,7 @@ class ShortcutMgrLg {
 
   const char* getIconFile(const char* pkg);
   const char* getInstalledApps();
+  const char* getInstalledAppsV1();
   bool closeApp(char* appname, char* pkgname);
   bool launchApp(char* pkgname, bool fullscreen, int width, int height, int density);
   bool launchAppBlk(char* pkgname);
@@ -77,6 +78,7 @@ class ShortcutMgrLg {
   std::string mLauncherAppPath;
   std::string mIconFilePath;
   std::string mInstalledApps;
+  std::string mInstalledAppsV1;
   // kmre2-uid-username
   std::string apkDownloadPath = "/var/lib/kydroid/kmre2-%d-%s/data/local/tmp/%s";
   std::string apkCachePath = "%s/.cache/uksc/wget_down/%s";

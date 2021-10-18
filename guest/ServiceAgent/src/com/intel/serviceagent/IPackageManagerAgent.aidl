@@ -12,4 +12,5 @@ interface IPackageManagerAgent {
     String getAppName(String pkg);
     String getAppVersion(String pkg);
     byte[] getIcon(String pkg);
+    long getApkSize(String pkg);
 }

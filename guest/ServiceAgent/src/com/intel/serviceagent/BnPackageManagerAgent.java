@@ -247,6 +247,28 @@ public class BnPackageManagerAgent extends IPackageManagerAgent.Stub {
     }
 
     @Override
+    public long getApkSize(String pkg) throws RemoteException {
+	long apk_file_size = 0;
+	try {
+
+            ApplicationInfo appInfo =
+                mPm.getApplicationInfo(pkg, PackageManager.GET_META_DATA);
+
+            File apk_file = new File(appInfo.publicSourceDir);
+
+            if (apk_file.exists()) {
+                apk_file_size = apk_file.length();
+            }
+
+	    return apk_file_size;
+	}
+	catch (Exception e) {
+	    e.printStackTrace();
+	}
+        return 0;
+    }
+
+    @Override
     public void addInstallerListener(IPackageInstallerListener listener) throws RemoteException {
         mInstallerListener = listener;
     }

@@ -272,6 +272,42 @@ BpPackageManagerAgent::BpPackageManagerAgent(const ::android::sp<::android::IBin
   return _aidl_status;
 }
 
+::android::binder::Status BpPackageManagerAgent::getApkSize(const ::android::String16& pkg, int64_t* _aidl_return) {
+  ::android::Parcel _aidl_data;
+  ::android::Parcel _aidl_reply;
+  ::android::status_t _aidl_ret_status = ::android::OK;
+  ::android::binder::Status _aidl_status;
+  _aidl_ret_status = _aidl_data.writeInterfaceToken(getInterfaceDescriptor());
+  if (((_aidl_ret_status) != (::android::OK))) {
+    goto _aidl_error;
+  }
+  _aidl_ret_status = _aidl_data.writeString16(pkg);
+  if (((_aidl_ret_status) != (::android::OK))) {
+    goto _aidl_error;
+  }
+  _aidl_ret_status = remote()->transact(::android::IBinder::FIRST_CALL_TRANSACTION + 7 /* getApkSize */, _aidl_data, &_aidl_reply);
+  if (UNLIKELY(_aidl_ret_status == ::android::UNKNOWN_TRANSACTION && IPackageManagerAgent::getDefaultImpl())) {
+     return IPackageManagerAgent::getDefaultImpl()->getApkSize(pkg, _aidl_return);
+  }
+  if (((_aidl_ret_status) != (::android::OK))) {
+    goto _aidl_error;
+  }
+  _aidl_ret_status = _aidl_status.readFromParcel(_aidl_reply);
+  if (((_aidl_ret_status) != (::android::OK))) {
+    goto _aidl_error;
+  }
+  if (!_aidl_status.isOk()) {
+    return _aidl_status;
+  }
+  _aidl_ret_status = _aidl_reply.readInt64(_aidl_return);
+  if (((_aidl_ret_status) != (::android::OK))) {
+    goto _aidl_error;
+  }
+  _aidl_error:
+  _aidl_status.setFromStatusT(_aidl_ret_status);
+  return _aidl_status;
+}
+
 }  // namespace serviceagent
 
 }  // namespace intel
@@ -462,6 +498,32 @@ BnPackageManagerAgent::BnPackageManagerAgent()
       break;
     }
     _aidl_ret_status = _aidl_reply->writeByteVector(_aidl_return);
+    if (((_aidl_ret_status) != (::android::OK))) {
+      break;
+    }
+  }
+  break;
+  case ::android::IBinder::FIRST_CALL_TRANSACTION + 7 /* getApkSize */:
+  {
+    ::android::String16 in_pkg;
+    int64_t _aidl_return;
+    if (!(_aidl_data.checkInterface(this))) {
+      _aidl_ret_status = ::android::BAD_TYPE;
+      break;
+    }
+    _aidl_ret_status = _aidl_data.readString16(&in_pkg);
+    if (((_aidl_ret_status) != (::android::OK))) {
+      break;
+    }
+    ::android::binder::Status _aidl_status(getApkSize(in_pkg, &_aidl_return));
+    _aidl_ret_status = _aidl_status.writeToParcel(_aidl_reply);
+    if (((_aidl_ret_status) != (::android::OK))) {
+      break;
+    }
+    if (!_aidl_status.isOk()) {
+      break;
+    }
+    _aidl_ret_status = _aidl_reply->writeInt64(_aidl_return);
     if (((_aidl_ret_status) != (::android::OK))) {
       break;
     }
