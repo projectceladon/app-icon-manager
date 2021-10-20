@@ -57,8 +57,8 @@ function install_vm-manager() {
 	local REL_URL=$(wget -q -nv -O- https://api.github.com/repos/projectceladon/vm_manager/releases/latest 2>/dev/null | jq -r '.assets[] | select(.browser_download_url | contains("ubuntu-20.04.deb")) | .browser_download_url')
 	if [ -z $REL_URL ]; then
 		echo "Trying to using local package..."
-		if [ -f $HOME/vm-manager_v0.4.1_ubuntu-20.04.deb ]; then
-			sudo dpkg --no-debsig -i $HOME/vm-manager_v0.4.1_ubuntu-20.04.deb
+		if [ -f $HOME/vm-manager_*_ubuntu-20.04.deb ]; then
+			sudo dpkg --no-debsig -i $HOME/vm-manager_*_ubuntu-20.04.deb
 		else
 			echo "Failed to acquire latest release for vm-manager, Please download/install from https://github.com/projectceladon/vm_manager/releases/"
 			exit -1
