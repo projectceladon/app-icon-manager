@@ -182,7 +182,9 @@ bool ShortcutMgrLg::launchAppBlk(char* pkgname) {
     cout << "intent: " << intent << endl;
 
     char cmdbuf[512];
-    snprintf(cmdbuf, sizeof(cmdbuf), "/opt/cfc/mwc/bin/loadapp_single_lg.sh %s %s 0", pkgname, intent.c_str());
+    std::string app_icon_label = m_app_label_map[pkgname];
+
+    snprintf(cmdbuf, sizeof(cmdbuf), "/opt/cfc/mwc/bin/loadapp_single_lg.sh %s %s 0 %s", pkgname, intent.c_str(), app_icon_label.c_str());
     system(cmdbuf);
     return true;
 }
@@ -196,10 +198,11 @@ bool ShortcutMgrLg::launchApp(char* pkgname, bool fullscreen, int width, int hei
     std::string intent = m_app_intent_map[pkgname];
     cout << "intent: " << intent << endl;
 
+    std::string app_icon_label = m_app_label_map[pkgname];
     char cmdbuf[512];
 #ifdef LG_SINGLE_MODE
     if (0==fork()) {
-        snprintf(cmdbuf, sizeof(cmdbuf), "/opt/cfc/mwc/bin/loadapp_single_lg.sh %s %s 0", pkgname, intent.c_str());
+        snprintf(cmdbuf, sizeof(cmdbuf), "/opt/cfc/mwc/bin/loadapp_single_lg.sh %s %s 0 %s", pkgname, intent.c_str(), app_icon_label.c_str());
         system(cmdbuf);
         exit(0);
     }
@@ -241,13 +244,14 @@ int ShortcutMgrLg::updateInstalledApps()
 	std::string intent;
 	std::string name;
 	std::string version;
-	//std::string label;
+	std::string label;
 	for (unsigned int i = 0; i < apps.size(); i++) {
 	    intent = apps[i]["Intent"].asString();
 	    name = apps[i]["Name"].asString();
 	    version = apps[i]["Version"].asString();
-	    //label = apps[i]["AppLabel"].asString();
+	    label = apps[i]["AppLabel"].asString();
 	    m_app_intent_map[name] = intent;
+	    m_app_label_map[name] = label;
 	    if ( 0 != i) {
 		mInstalledApps += ", ";
 	    }
@@ -303,14 +307,15 @@ const char* ShortcutMgrLg::getInstalledAppsV1()
 	std::string name;
 	std::string version;
 	int64_t apksize;
-	//std::string label;
+	std::string label;
 	for (unsigned int i = 0; i < apps.size(); i++) {
 	    intent = apps[i]["Intent"].asString();
 	    name = apps[i]["Name"].asString();
 	    version = apps[i]["Version"].asString();
 	    apksize = apps[i]["ApkSize"].asInt64();
-	    //label = apps[i]["AppLabel"].asString();
+	    label = apps[i]["AppLabel"].asString();
 	    m_app_intent_map[name] = intent;
+	    m_app_label_map[name] = label;
 	    if ( 0 != i) {
 		mInstalledAppsV1 += ", ";
 	    }

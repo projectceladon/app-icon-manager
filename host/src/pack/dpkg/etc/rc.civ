@@ -17,8 +17,6 @@ then
        mkdir -p $HOME/.intel/.civ/
        cp /opt/cfc/mwc/bin/penguin-peak.ini $HOME/.intel/.civ/
        sed -i "s%/home/kylin/civ/.userdata/username.img%${HOME}/.userdata/${USER}.img%g" $HOME/.intel/.civ/penguin-peak.ini
-       mkdir -p $HOME/civshare
-       sed -i "s%/home/kylin/civ/hostshare%${HOME}/civshare%g" $HOME/.intel/.civ/penguin-peak.ini
        mkdir -p $HOME/.userdata/vtpm0
        sed -i "s%/opt/civ/data/Release_Deb/vtpm0%${HOME}/.userdata/vtpm0%g" $HOME/.intel/.civ/penguin-peak.ini
        mkdir -p $HOME/Android/Pictures -m 0777

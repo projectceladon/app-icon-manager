@@ -4,7 +4,7 @@ NUM_PARAMS=$#
 
 if [[ "$NUM_PARAMS" -lt "2" ]];
 then
-    echo "Usage: lg_launcher.sh <appname> <activity>"
+    echo "Usage: lg_launcher.sh <appname> <activity> [app icon label]"
     exit 1
 fi
 
