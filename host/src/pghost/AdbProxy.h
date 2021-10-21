@@ -109,11 +109,20 @@ class AdbProxy : public AmInterface {
   static const int kMsgBufSize = 1024;
   const char* msgDeviceList = "adb devices";
   const char* msgDeviceListHead = "List of devices attached";
+#ifdef VSOCK_ADB
+  const char* msgConnect = "adb connect vsock:3:5555";
+  const char* msgConnectOk = "connected to vsock:3:5555";
+#else
   const char* msgConnect = "adb connect localhost";
   const char* msgConnectOk = "connected to localhost:5555";
+#endif
   const char* msgErrorBroken = "error: device not found";
   const char* msgErrorOffline = "error: device offline";
+#ifdef VSOCK_ADB
+  const char* msgAndroidVerison = "adb -s vsock:3:5555 shell getprop | grep -i ro.system.build.version.release";
+#else
   const char* msgAndroidVerison = "adb shell getprop | grep -i ro.system.build.version.release";
+#endif
   const int KEYCODE_HOME = 3;
   const int KEYCODE_BACK = 4;
   const int KEYCODE_MENU = 82;

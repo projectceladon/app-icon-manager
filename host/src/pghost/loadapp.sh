@@ -8,7 +8,7 @@ then
     exit 1
 fi
 
-adb shell am start -n $2 --display $3
+adb -s vsock:3:5555 shell am start -n $2 --display $3
 /opt/lg/bin/LG_B1_Client -M yes -R 16666 -f /dev/shm/looking-glass$3 -a true -t $1
 
 
