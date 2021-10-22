@@ -84,5 +84,6 @@ class ShortcutMgrLg {
   std::string apkCachePath = "%s/.cache/uksc/wget_down/%s";
   AdbProxy* m_adbproxy_;
   std::map <string, string> m_app_intent_map;
+  std::map <string, string> m_app_label_map;
 };
 #endif

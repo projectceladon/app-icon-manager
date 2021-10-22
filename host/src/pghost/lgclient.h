@@ -45,6 +45,7 @@ class LGClient
 	void setAppName(char* appname);
         void setActivity(char* activity);
 	void setPkgName(char* pkgname);
+	void setAppIconLabel(char* appiconlabel);
 	// send the close app message to daemon and let the daemon
 	// to notify the registered client.
 	int closeApp();
@@ -78,6 +79,7 @@ class LGClient
         char     m_activity[512];
 	char     m_appname[512];
 	char     m_pkgname[512];
+	std::string     m_app_icon_label;
         int      m_exec_mode        = 0;
 	volatile bool release_res   = true;
 	void     ReleaseRes();

@@ -35,9 +35,9 @@ Date: 2021.04.27
 int main(int argc, char **argv)
 {
 
-    if (argc !=5 )
+    if (argc <5 )
     {
-        printf ("Usage: %s lg-daemon-address lg-daemon-port appname activity\n",
+        printf ("Usage: %s lg-daemon-address lg-daemon-port appname activity [app icon label]\n",
                 argv[0]);
         exit(1);
     }
@@ -47,6 +47,11 @@ int main(int argc, char **argv)
 
     char* appname            = argv[3];
     char* activity         = argv[4];
+    char* app_icon_label     = NULL;
+    if (argc >5) {
+        app_icon_label = argv[5];
+    }
+    printf ("argc: %d, app_icon_labeL: %s\n", argc, app_icon_label);
     int ret = 0;
     int port = atoi (lg_daemon_port); 
 
@@ -59,6 +64,7 @@ int main(int argc, char **argv)
     client->setEndMode (MODE_AUTOEXIT);
     client->setAppName (appname);
     client->setActivity (activity);
+    client->setAppIconLabel (app_icon_label);
 
     client->setCliCommParams (lg_daemon_server, port);
     ret = client->Init();
