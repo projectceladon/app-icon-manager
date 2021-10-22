@@ -114,7 +114,6 @@ void LGClient::Destroy()
 int LGClient::Init()
 {
     memset (lg_instance_id, 0, sizeof(lg_instance_id));
-
     int ret = 0;
     ret = connectToVatClient();
 
@@ -137,10 +136,16 @@ int LGClient::loadApp()
 {
     char cmd[512];
 #ifdef LG_SINGLE_MODE
-    snprintf (cmd, sizeof(cmd), "/opt/cfc/mwc/bin/loadapp_single_lg.sh %s %s %s", m_appname, m_activity, lg_instance_id);
+    if (m_app_icon_label.length() > 0) {
+        snprintf (cmd, sizeof(cmd), "/opt/cfc/mwc/bin/loadapp_single_lg.sh \"%s\" \"%s\" \"%s\" \"%s\"", m_appname, m_activity, lg_instance_id, m_app_icon_label.c_str());
+    }
+    else {
+        snprintf (cmd, sizeof(cmd), "/opt/cfc/mwc/bin/loadapp_single_lg.sh \"%s\" \"%s\" \"%s\" \"%s\"", m_appname, m_activity, lg_instance_id, "安卓应用");
+    }
 #else
     snprintf (cmd, sizeof(cmd), "/opt/cfc/mwc/bin/loadapp.sh %s %s %s", m_appname, m_activity, lg_instance_id);
 #endif
+    printf("cmd: %s\n", cmd);
     system (cmd);
     return 0;
 }
@@ -183,6 +188,14 @@ void LGClient::setActivity (char* activity)
 void LGClient::setPkgName (char* pkgname)
 {
     snprintf(m_pkgname, sizeof(m_pkgname), "%s", pkgname);
+}
+
+void LGClient::setAppIconLabel(char* appiconlabel)
+{
+    printf("LGClient::setAppIconLabel, appiconlable:%s\n", appiconlabel);
+    if (appiconlabel) {
+        m_app_icon_label = appiconlabel;
+    }
 }
 
 void* LGClient::execLG(void* data)

@@ -16,5 +16,5 @@ sleep 10
 /opt/lg/bin/LG_B1_Client_clipboard guestClipboard:enable=true
 
 #Balloon guest memory to 2048M on boot
-/opt/cfc/mwc/bin/balloon_guest.sh 2048
+#/opt/cfc/mwc/bin/balloon_guest.sh 2048
 exit 0

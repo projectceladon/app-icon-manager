@@ -153,9 +153,9 @@ static int dump_app_desktop_files ()
 		}
 
 		fprintf(fp, "[Desktop Entry]\n");
-		fprintf(fp, "Name=%s\n", String8(appname).string());
+		fprintf(fp, "Name[zh_CN]=%s\n", String8(appname).string());
 		fprintf(fp, "Comment=Android App %s\n", String8(pkg).string());
-		fprintf(fp, "Exec=/opt/cfc/mwc/bin/lg_launcher.sh %s %s\n",String8(pkg).string(), String8(intent).string()); 
+		fprintf(fp, "Exec=/opt/cfc/mwc/bin/lg_launcher.sh %s %s %s\n",String8(pkg).string(), String8(intent).string(), String8(appname).string());
 		fprintf(fp, "Icon=~/.local/share/applications/icon/%s.png\n",  String8(pkg).string());
 		fprintf(fp, "Type=Application\n");
 		fprintf(fp, "Terminal=false\n");
