@@ -25,6 +25,15 @@ then
        sed -i "s%/home/kylin/Android/Download%${HOME}/Android/Download%g" $HOME/.intel/.civ/penguin-peak.ini
    fi
 
+   if [ ! -d $HOME/桌面/拓展应用文件夹 ]
+   then
+      mkdir -p $HOME/桌面/拓展应用文件夹
+      cd $HOME/桌面/拓展应用文件夹
+      ln -s $HOME/Android/Pictures/WeiXin/ 微信图片
+      ln -s $HOME/Android/Download/WeiXin/ 微信下载
+      cd -
+   fi
+
    vm-manager -b penguin-peak >> $TEMP_LOG &
    sleep 10
    ${CIV_PATH}/scripts/stream >> $TEMP_LOG &
