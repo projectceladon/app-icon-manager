@@ -8,7 +8,14 @@ then
     exit 1
 fi
 
-adb shell am start -n $2 --display 0
+num_adb_devices=`adb devices | grep vsock.*device | grep -v grep | wc -l`
+if [[ "$num_adb_devices" -lt "1" ]];
+then
+    adb connect "vsock:3:5555"
+fi
+
+
+adb -s vsock:3:5555 shell am start -n $2 --display 0
 
 num_lg_insts=`ps aux | grep LG_B1_Client | grep -v guestClipboard.*enable.*true | grep -v grep | wc -l`
 

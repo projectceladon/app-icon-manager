@@ -172,7 +172,11 @@ bool AdbProxy::getDeviceName() {
     }
     // find a online device
     while (!feof(pf) && fgets(mMsgBuf, kMsgBufSize, pf)) {
+#ifdef VSOCK_ADB
+      if (strstr(mMsgBuf, "vsock") && strstr(mMsgBuf, "\tdevice")) {
+#else
       if (strstr(mMsgBuf, "\tdevice")) {
+#endif
         char name[32];
         sscanf(mMsgBuf, "%32s", name);
         mDeviceName = name;

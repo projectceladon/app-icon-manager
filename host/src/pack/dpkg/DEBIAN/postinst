@@ -5,4 +5,3 @@ udevadm trigger
 
 systemctl enable mwc
 systemctl start mwc.service
-systemctl status mwc.service

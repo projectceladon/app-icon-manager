@@ -229,8 +229,8 @@ int ShortcutMgrLg::updateInstalledApps()
     if (home) {
 	snprintf(filepath, sizeof(filepath), "%s/.installed_apps.json", home);
 	char cmdbuf[512];
-	snprintf(cmdbuf, sizeof(cmdbuf), "adb pull /sdcard/installed_apps.json %s", filepath);
-	system(cmdbuf);
+	snprintf(cmdbuf, sizeof(cmdbuf), "pull /sdcard/installed_apps.json %s", filepath);
+        m_adbproxy_->runCmd(cmdbuf);
 	Json::Value root;
 	std::ifstream ifs;
 	ifs.open(filepath);
@@ -291,8 +291,8 @@ const char* ShortcutMgrLg::getInstalledAppsV1()
     if (home) {
 	snprintf(filepath, sizeof(filepath), "%s/.installed_apps_v1.json", home);
 	char cmdbuf[512];
-	snprintf(cmdbuf, sizeof(cmdbuf), "adb pull /sdcard/installed_apps_v1.json %s", filepath);
-	system(cmdbuf);
+        snprintf(cmdbuf, sizeof(cmdbuf), "pull /sdcard/installed_apps_v1.json %s", filepath);
+        m_adbproxy_->runCmd(cmdbuf);
 	Json::Value root;
 	std::ifstream ifs;
 	ifs.open(filepath);

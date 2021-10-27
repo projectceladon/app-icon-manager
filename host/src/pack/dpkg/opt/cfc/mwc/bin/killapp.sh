@@ -8,7 +8,7 @@ then
     exit 1
 fi
 
-adb shell am force-stop $1
+adb -s vsock:3:5555 shell am force-stop $1
 
 exit 0
 
