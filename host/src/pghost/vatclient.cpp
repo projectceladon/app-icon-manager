@@ -241,6 +241,20 @@ int VatClient::HandleEventSingleLG(Event* event)
             running = 0;
             break;
 
+	case EVENT_REQ_GET_APP_LAST_OPENED:
+	    if (m_lg_slots[0]->slot_status != LGSLOT_USED) {
+                snprintf(app_last_opened, sizeof(app_last_opened), "{lg_instance_id=%d;};", -1);
+                compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_NO_APP_LAST_OPENED, app_last_opened);
+                m_launcherconnmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+	    }
+	    else {
+                snprintf(app_last_opened, sizeof(app_last_opened), "{appname=%s,appactivity=%s,};", m_lg_slots[0]->appname, m_lg_slots[0]->activity);
+                compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_GET_APP_LAST_OPENED, app_last_opened);
+                m_launcherconnmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+	    }
+            running = 0;
+            break;
+
 	case EVENT_NOTIFY_LG_APP_CLOSED:
 	    running = 0;
 	    break;

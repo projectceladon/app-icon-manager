@@ -50,6 +50,7 @@ class LGClient
 	// to notify the registered client.
 	int closeApp();
 	int closeAppLastOpened();
+        int getAppLastOpened();
 	char* getAppName();
 	char* getActivityName();
 
