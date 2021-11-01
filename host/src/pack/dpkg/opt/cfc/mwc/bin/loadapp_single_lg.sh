@@ -17,7 +17,7 @@ fi
 
 adb -s vsock:3:5555 shell am start -n $2 --display 0
 
-num_lg_insts=`ps aux | grep LG_B1_Client | grep -v guestClipboard.*enable.*true | grep -v grep | wc -l`
+num_lg_insts=`ps aux | grep LG_B1_Client.*looking-glass | grep -v guestClipboard.*enable.*true | grep -v grep | wc -l`
 
 echo "App name: $1, Activity: $2, LG Instance ID: $3 Label: $4"
 

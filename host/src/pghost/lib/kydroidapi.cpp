@@ -125,8 +125,25 @@ char* get_installed_applist_v1()
 
 bool is_android_env_installed()
 {
-    // TODO: needs to check if Android guest installed or not.
-   return true;
+    // There 3 deb packages needs to be installed for Android guest:
+    // android-virtual, vm-manager and cfc.
+    char * INSTALLED_PKGS_CMD="/opt/cfc/mwc/bin/get_num_android_pkgs.sh";
+
+    FILE* pf = popen(INSTALLED_PKGS_CMD, "r");
+    char shell_cmd_buffer[1024];
+    int num_pkgs = 0;
+    if (pf) {
+        if (!feof(pf) && fgets(shell_cmd_buffer, sizeof(shell_cmd_buffer), pf)) {
+	    num_pkgs = atoi(shell_cmd_buffer);
+	}
+    }
+    printf("Num installed android packages: %d\n", num_pkgs);
+    if (num_pkgs >= 3) {
+	return true;
+    }
+    else {
+	return false;
+    }
 }
 
 bool is_android_env_running()

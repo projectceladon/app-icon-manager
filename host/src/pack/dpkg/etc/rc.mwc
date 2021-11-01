@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-echo "Configure the LG node & permissions..." >/opt/cfc/mwc.log
+echo "Configure the LG node & permissions..."
 for i in 0 1 2 3
 do
     if [ ! -f /dev/shm/looking-glass$i ]
@@ -12,6 +12,6 @@ do
     chmod 666 /dev/shm/looking-glass$i
 done
 
-echo "Start mwc daemon service ..." >> /opt/cfc/mwc.log
-/opt/cfc/mwc/bin/mwc_hostdaemon 3000 >> /opt/cfc/mwc.log
+echo "Start mwc daemon service ..."
+/opt/cfc/mwc/bin/mwc_hostdaemon 3000
 exit 0

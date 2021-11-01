@@ -243,6 +243,20 @@ int LGClient::closeApp()
 
 }
 
+int LGClient::getAppLastOpened()
+{
+    running = 1;
+    char lgmsg_body[256];
+    snprintf (lgmsg_body, sizeof(lgmsg_body), "{lg_instance_id=%s;}", lg_instance_id);
+
+    char msg_body[512];
+    compose_msg_body(msg_body, sizeof(msg_body), EVENT_REQ_GET_APP_LAST_OPENED, lgmsg_body);
+    m_connmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+    mainLoop();
+
+    return result;
+}
+
 int LGClient::closeAppLastOpened()
 {
     running = 1;
@@ -351,6 +365,25 @@ int LGClient::HandleEvent(Event* event)
 	    running = 0;
 	    result = 0;
 	    break;
+
+	case EVENT_RES_GET_APP_LAST_OPENED:
+            get_key_value (event->event_data + 1,
+                           (char*) "appname",
+                           m_appname,
+                           (char*) "=",
+                           (char*) ",");
+	    // make the pkgname same as appname.
+	    snprintf(m_pkgname, sizeof(m_pkgname), "%s", m_appname);
+	    get_key_value (event->event_data + 1,
+                           (char*) "appactivity",
+                           m_activity,
+                           (char*) "=",
+                           (char*) ",");
+	    //release_res = false;
+	    running = 0;
+	    result = 0;
+	    break;
+
 	case EVENT_RES_NO_APP_LAST_OPENED:
 	    running = 0;
 	    result = -1;

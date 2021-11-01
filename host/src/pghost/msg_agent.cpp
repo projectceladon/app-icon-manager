@@ -33,6 +33,45 @@ Date: 2021.04.27
 
 #include "AdbProxy.h"
 
+typedef struct s_cmd_map {
+    const char * cmd_name;
+    int  cmd_id;
+} cmd_map_t;
+
+enum {
+    CMD_CLOSEAPP,
+    CMD_CLOSEAPP_LASTOPENED,
+    CMD_GET_APP_LASTOPENED
+};
+
+cmd_map_t cmd_maps[] = {
+    {"CLOSEAPP",                  CMD_CLOSEAPP},
+    {"CLOSEAPP_LASTOPENED",       CMD_CLOSEAPP_LASTOPENED},
+    {"GET_APP_LASTOPENED",        CMD_GET_APP_LASTOPENED},
+};
+
+int get_cmd_id_by_name (char *cmd_name)
+{
+
+   int ret = -1;
+
+   int i;
+
+   int map_size = sizeof(cmd_maps)/sizeof(cmd_map_t);
+
+   for (i=0; i<map_size; i++)
+   {
+       if (0 == strcasecmp(cmd_maps[i].cmd_name, cmd_name))
+       {
+           ret = cmd_maps[i].cmd_id;
+           break;
+       }
+   }
+
+   return ret;
+}
+
+
 int main(int argc, char **argv)
 {
 
@@ -46,56 +85,82 @@ int main(int argc, char **argv)
     char* lg_daemon_server = argv[1];
     char* lg_daemon_port   = argv[2];
     int ret = 0;
-
-    if (strstr("CLOSEAPP", argv[3]) !=0 && argc >= 5) {
-        char* appname            = argv[4];
-        char* pkgname         = argv[5];
-
-        int port = atoi (lg_daemon_port); 
-
-        LGClient* client = new LGClient();
-
-        client->setEndMode (MODE_AUTOEXIT);
-        client->setAppName (appname);
-        client->setPkgName (pkgname);
-
-        client->setCliCommParams (lg_daemon_server, port);
-        client->Init();
-
-        client->closeApp();
-
-        ret = client->getResult();
-
-        client->Destroy();
-
-        delete client;
-    } else {
-	if (strstr("CLOSEAPP_LASTOPENED", argv[3]) != 0) {
-            int port = atoi (lg_daemon_port);
-
-            LGClient* client = new LGClient();
-
-            client->setEndMode (MODE_AUTOEXIT);
-            client->setCliCommParams (lg_daemon_server, port);
-            ret = client->Init();
-            if (ret >=0) {
-	        // for daemon service to update launched app record.
-                ret = client->closeAppLastOpened();
-                if (ret >=0 ) {
-	            // appname is same with pkgname right now.
-	            char* appname = client->getAppName();
-	            char* activity = client->getActivityName();
-                    // close the app
-	            AdbProxy* adb_proxy = AdbProxy().getInstance();
-	            adb_proxy->closeActivity(appname);
-	        }
-	        ret = client->getResult();
-            }
-	    client->Destroy();
-	    delete client;
-	}
-	else {
-	    printf ("Unknown arguments, argv[3]:%s, argc:%d\n", argv[3], argc);
+    int cmd_id = get_cmd_id_by_name(argv[3]);
+    if (cmd_id < 0) {
+	ret = -1;
+        printf ("Unknown arguments, argv[3]:%s, argc:%d\n", argv[3], argc);
+    }
+    else {
+        switch (cmd_id)
+	{
+            case CMD_CLOSEAPP:
+                {
+                    char* appname            = argv[4];
+                    char* pkgname         = argv[5];
+                    int port = atoi (lg_daemon_port);
+                    LGClient* client = new LGClient();
+                    client->setEndMode (MODE_AUTOEXIT);
+                    client->setAppName (appname);
+                    client->setPkgName (pkgname);
+                    client->setCliCommParams (lg_daemon_server, port);
+                    client->Init();
+                    client->closeApp();
+                    ret = client->getResult();
+                    client->Destroy();
+                    delete client;
+                }
+                break;
+	    case CMD_CLOSEAPP_LASTOPENED:
+                {
+                    int port = atoi (lg_daemon_port);
+                    LGClient* client = new LGClient();
+                    client->setEndMode (MODE_AUTOEXIT);
+                    client->setCliCommParams (lg_daemon_server, port);
+                    ret = client->Init();
+                    if (ret >=0) {
+                        // for daemon service to update launched app record.
+                        ret = client->closeAppLastOpened();
+                        if (ret >=0 ) {
+                            // appname is same with pkgname right now.
+                            char* appname = client->getAppName();
+                            char* activity = client->getActivityName();
+                            printf("appname: %s, activity: %s\n", appname, activity);
+                            // close the app
+                            AdbProxy* adb_proxy = AdbProxy().getInstance();
+                            adb_proxy->closeActivity(appname);
+                        }
+                        ret = client->getResult();
+                    }
+                    client->Destroy();
+                    delete client;
+		}
+                break;
+	    case CMD_GET_APP_LASTOPENED:
+                {
+                    int port = atoi (lg_daemon_port);
+                    LGClient* client = new LGClient();
+                    client->setEndMode (MODE_AUTOEXIT);
+                    client->setCliCommParams (lg_daemon_server, port);
+                    ret = client->Init();
+                    if (ret >=0) {
+                        // for daemon service to update launched app record.
+                        ret = client->getAppLastOpened();
+                        if (ret >=0 ) {
+                            // appname is same with pkgname right now.
+                            char* appname = client->getAppName();
+                            char* activity = client->getActivityName();
+			    printf("appname: %s, activity: %s\n", appname, activity);
+                        }
+			else {
+			    printf("no app opened previously!\n");
+			}
+                    }
+                    client->Destroy();
+                    delete client;
+                }
+                break;
+            default:
+                break;
 	}
     }
 
