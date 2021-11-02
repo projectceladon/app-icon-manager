@@ -40,6 +40,7 @@ class ShortcutMgrLg {
         sInst->init();
       }
     }
+    system("/opt/cfc/mwc/bin/resume_civ.sh");
     return sInst;
   }
 

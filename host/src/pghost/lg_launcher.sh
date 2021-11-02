@@ -33,6 +33,9 @@ then
     previous_app=`/opt/cfc/mwc/bin/msg_agent localhost 3000 GET_APP_LASTOPENED | grep "appname" | grep -v grep | sed 's/^appname: *\(.*\),.*$/\1/g'`
 fi
 
+# Resume CiV
+/opt/cfc/mwc/bin/resume_civ.sh
+
 /opt/cfc/mwc/bin/mwc_launcher localhost 3000 $@
 
 echo "appname:$1, previous_app:$previous_app"
@@ -55,6 +58,11 @@ if [ ! -z ${ENABLE_CIV_BALLOON} ]; then
     if [ -z $(pidof mwc_launcher) ]; then
         /opt/cfc/mwc/bin/balloon_guest.sh 2048
     fi
+fi
+
+# Pause CiV
+if [ -z $(pidof mwc_launcher) ]; then
+    /opt/cfc/mwc/bin/pause_civ.sh
 fi
 
 exit 0
