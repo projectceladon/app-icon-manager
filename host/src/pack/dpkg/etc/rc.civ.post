@@ -19,4 +19,11 @@ if [ ! -z ${ENABLE_CIV_BALLOON} ]; then
     /opt/cfc/mwc/bin/balloon_guest.sh 2048
 fi
 
+#wait for android ready
+sleep 20
+# Pause CiV
+if [ -z "$(pidof mwc_launcher)" ] && [ -z "$(pgrep -ax adb | grep -v "fork-server")" ]; then
+    /opt/cfc/mwc/bin/pause_civ.sh
+fi
+
 exit 0
