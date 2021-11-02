@@ -21,7 +21,9 @@ else
 fi
 
 # Balloon Guest memory to 4096MB
-# /opt/cfc/mwc/bin/balloon_guest.sh 4096
+if [ ! -z ${ENABLE_CIV_BALLOON} ]; then
+    /opt/cfc/mwc/bin/balloon_guest.sh 4096
+fi
 
 num_lg_insts=`ps aux | grep LG_B1_Client.*looking-glass | grep -v guestClipboard.*enable.*true | grep -v grep | wc -l`
 previous_app=""
@@ -49,9 +51,11 @@ then
 fi
 
 # Balloon Guest memory to 2048MB if no mwc_launcher live
-#if [ -z $(pidof mwc_launcher) ]; then
-#    /opt/cfc/mwc/bin/balloon_guest.sh 2048
-#fi
+if [ ! -z ${ENABLE_CIV_BALLOON} ]; then
+    if [ -z $(pidof mwc_launcher) ]; then
+        /opt/cfc/mwc/bin/balloon_guest.sh 2048
+    fi
+fi
 
 exit 0
 
