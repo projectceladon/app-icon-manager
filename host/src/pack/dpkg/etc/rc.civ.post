@@ -10,6 +10,9 @@ ${CIV_PATH}/scripts/stream &
 export DISPLAY=:0
 /opt/lg/bin/LG_B1_Client_input &
 
+# monitor share folder
+/bin/bash /etc/sharefolder_monitor.sh &
+
 sleep 10
 
 /opt/lg/bin/LG_B1_Client_clipboard guestClipboard:enable=true &
