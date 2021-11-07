@@ -1,0 +1,17 @@
+#!/bin/sh -e
+
+sleep 10
+CIV_PATH=/opt/civ/data/Release_Deb
+
+${CIV_PATH}/scripts/stream &
+
+# needs to set DISPLAY env for LG_B1_Client_input be able to
+# start at boot.
+export DISPLAY=:0
+/opt/lg/bin/LG_B1_Client_input &
+
+sleep 10
+
+/opt/lg/bin/LG_B1_Client_clipboard guestClipboard:enable=true &
+
+exit 0
