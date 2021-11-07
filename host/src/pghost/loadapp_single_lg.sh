@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# Get the number of running Android guest instances.
+num_civ_insts=`ps aux | grep qemu.*android | grep -v grep | wc -l`
+
+# Start the civ service if Android guest is not started yet.
+if [ "$num_civ_insts" -lt "1" ];
+then
+    systemctl --user start civ
+fi
+
 NUM_PARAMS=$#
 
 if [[ "$NUM_PARAMS" -lt "3" ]];
@@ -26,11 +35,13 @@ then
     #/opt/lg/bin/LG_B1_Client -M yes -R 16666 -f /dev/shm/looking-glass0 -a true -t $1
     if [[ "$NUM_PARAMS" -ge "4" ]];
     then
-        /opt/lg/bin/LG_B1_Client -M yes -R 16666 -f /dev/shm/looking-glass0 -a true -t $4
+        /opt/lg/bin/LG_B1_Client -M yes -R 16666 -f /dev/shm/looking-glass0 -a true -t $4 -P $1
     else
         /opt/lg/bin/LG_B1_Client -M yes -R 16666 -f /dev/shm/looking-glass0 -a true -t "安卓应用"
     fi
     /opt/cfc/mwc/bin/msg_agent localhost 3000 CLOSEAPP_LASTOPENED
+else
+    /opt/lg/bin/LG_B1_Client -Q $1 -t $4
 fi
 
 exit 0

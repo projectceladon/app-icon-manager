@@ -8,6 +8,18 @@ then
     exit 1
 fi
 
+num_start_app=`ps aux | grep startapp | grep -v grep | wc -l`
+
+if [ "$num_start_app" -lt "1" ];
+then
+    if [ "$(adb get-state | grep "device" | awk '{print $1}')" != "device" ];
+    then
+        /opt/lg/bin/startapp
+    fi
+else
+    exit 1
+fi
+
 # Balloon Guest memory to 4096MB
 # /opt/cfc/mwc/bin/balloon_guest.sh 4096
 

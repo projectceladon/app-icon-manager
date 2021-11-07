@@ -21,6 +21,16 @@ then
     mkdir -p ${civ_path}/aaf
     mkdir -p ${civ_path}/hostshare
 
+    echo "Update the /etc/rc.civ.post file ..."
+    CIV_RC_FILE_POST=/etc/rc.civ.post
+    if [ -f $CIV_RC_FILE_POST ]
+    then
+        sudo sed -i "s%^CIV_PATH=.*$%CIV_PATH=${civ_path}%g" $CIV_RC_FILE_POST
+        echo "/etc/rc.civ.post updated."
+    else
+        echo "Couldn't find the CIV rc post file: $CIV_RC_FILE_POST!"
+    fi
+
     echo "Update the /etc/rc.civ file ..."
     CIV_RC_FILE=/etc/rc.civ
     if [ -f $CIV_RC_FILE ]
