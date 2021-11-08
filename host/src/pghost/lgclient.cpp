@@ -115,7 +115,8 @@ int LGClient::Init()
 {
     memset (lg_instance_id, 0, sizeof(lg_instance_id));
 
-    connectToVatClient();
+    int ret = 0;
+    ret = connectToVatClient();
 
     m_event_queue = new EventQueue();
     m_connmgr     = new Connmgr();
@@ -123,7 +124,7 @@ int LGClient::Init()
     m_connmgr->setCommSock (m_sock);
     m_connmgr->connUp();
 
-    return 0;
+    return ret;
 }
 
 void LGClient::setCliCommParams(char* client, int port)
@@ -290,7 +291,7 @@ int LGClient::HandleEvent(Event* event)
                            (char*) ",");
 	    if (atoi(lg_instance_id) > -1) {
 		char lgapp_body[256];
-                snprintf (lgapp_body, sizeof(lgapp_body), "{appname=%s,activity=%s,lg_instance_id:%s,};", m_appname, m_activity, lg_instance_id);
+                snprintf (lgapp_body, sizeof(lgapp_body), "{appname=%s,appactivity=%s,lg_instance_id:%s,};", m_appname, m_activity, lg_instance_id);
                 char msg_body[512];
                 compose_msg_body(msg_body, sizeof(msg_body), EVENT_REQ_SET_LG_SLOT_APP_BUNDLE, lgapp_body);
                 m_connmgr->sendMsg (msg_body, (int) sizeof(msg_body));
@@ -329,7 +330,7 @@ int LGClient::HandleEvent(Event* event)
 	    // make the pkgname same as appname.
 	    snprintf(m_pkgname, sizeof(m_pkgname), "%s", m_appname);
 	    get_key_value (event->event_data + 1,
-                           (char*) "activity",
+                           (char*) "appactivity",
                            m_activity,
                            (char*) "=",
                            (char*) ",");

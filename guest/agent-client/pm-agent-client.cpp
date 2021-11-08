@@ -133,6 +133,16 @@ static int dump_app_desktop_files ()
 	    std::string fapp_desktop_launcher = "/sdcard/applications/";
 	    fapp_desktop_launcher.append(String8(pkg).string());
 	    fapp_desktop_launcher.append(".desktop");
+
+	    String16 appname;
+            status = pma->getAppName(pkg, &appname);
+
+	    if (!status.isOk()) {
+		printf("Failed to call getAppName, res=%s\n",
+			status.toString8().string());
+		return -1;
+	    }
+
 	    if (access(fapp_desktop_launcher.c_str(), F_OK) != 0) {
 
 		FILE* fp = fopen(fapp_desktop_launcher .c_str(), "wb");
@@ -143,7 +153,7 @@ static int dump_app_desktop_files ()
 		}
 
 		fprintf(fp, "[Desktop Entry]\n");
-		fprintf(fp, "Name=%s\n", String8(pkg).string());
+		fprintf(fp, "Name=%s\n", String8(appname).string());
 		fprintf(fp, "Comment=Android App %s\n", String8(pkg).string());
 		fprintf(fp, "Exec=/opt/cfc/mwc/bin/lg_launcher.sh %s %s\n",String8(pkg).string(), String8(intent).string()); 
 		fprintf(fp, "Icon=~/.local/share/applications/icon/%s.png\n",  String8(pkg).string());

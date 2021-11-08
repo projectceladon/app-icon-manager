@@ -77,18 +77,20 @@ int main(int argc, char **argv)
 
             client->setEndMode (MODE_AUTOEXIT);
             client->setCliCommParams (lg_daemon_server, port);
-            client->Init();
-	    // for daemon service to update launched app record.
-            ret = client->closeAppLastOpened();
-            if (ret >=0 ) {
-	        // appname is same with pkgname right now.
-	        char* appname = client->getAppName();
-	        char* activity = client->getActivityName();
-                // close the app
-	        AdbProxy* adb_proxy = AdbProxy().getInstance();
-	        adb_proxy->closeActivity(appname);
-	    }
-	    ret = client->getResult();
+            ret = client->Init();
+            if (ret >=0) {
+	        // for daemon service to update launched app record.
+                ret = client->closeAppLastOpened();
+                if (ret >=0 ) {
+	            // appname is same with pkgname right now.
+	            char* appname = client->getAppName();
+	            char* activity = client->getActivityName();
+                    // close the app
+	            AdbProxy* adb_proxy = AdbProxy().getInstance();
+	            adb_proxy->closeActivity(appname);
+	        }
+	        ret = client->getResult();
+            }
 	    client->Destroy();
 	    delete client;
 	}

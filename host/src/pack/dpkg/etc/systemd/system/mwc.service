@@ -9,6 +9,9 @@ TimeoutSec=0
 StandardOutput=tty
 RemainAfterExit=yes
 SysVStartPriority=99
+Restart=always
+RestartSec=3
+
  
 [Install]
 WantedBy=multi-user.target
