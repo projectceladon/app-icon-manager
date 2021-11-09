@@ -9,6 +9,7 @@ ${CIV_PATH}/scripts/stream &
 # start at boot.
 export DISPLAY=:0
 /opt/lg/bin/LG_B1_Client_input &
+/bin/bash /etc/sharefolder_monitor.sh &
 
 sleep 10
 
