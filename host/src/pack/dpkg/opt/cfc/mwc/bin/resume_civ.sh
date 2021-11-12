@@ -54,10 +54,18 @@ function resume_civ()
 {
     echo "Send QMP: cont"
     local out
+    local i
     echo "{ \"execute\": \"cont\"}" >&4
-    read -u 5 -t 1 -r out && echo "OUTPUT: $out"
-    read -u 5 -t 1 -r out && echo "OUTPUT: $out"
+    for i in {0..9}; do
+        read -u 5 -t 1 -r out
+        echo "OUTPUT: $out"
+        if [[ ${#out} -eq 15 && "${out:0:14}" == '{"return": {}}' ]]; then
+            return 0
+        fi
+    done
+    echo "Failed to resume CiV!"
+    return -1
 }
 
 connect_qmp || exit -1
-resume_civ
+resume_civ || exit -1

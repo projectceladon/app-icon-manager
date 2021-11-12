@@ -54,10 +54,18 @@ function pause_civ()
 {
     echo "Send QMP: stop"
     local out
+    local i
     echo "{ \"execute\": \"stop\"}" >&4
-    read -u 5 -t 1 -r out && echo "OUTPUT: $out"
-    read -u 5 -t 1 -r out && echo "OUTPUT: $out"
+    for i in {0..9}; do
+        read -u 5 -t 1 -r out
+        echo "OUTPUT: $out"
+        if [[ ${#out} -eq 15 && "${out:0:14}" == '{"return": {}}' ]]; then
+            return 0
+        fi
+    done
+    echo "Failed to Pause CiV!"
+    return -1
 }
 
 connect_qmp || exit -1
-pause_civ
+pause_civ || exit -1
