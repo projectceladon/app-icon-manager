@@ -1,32 +1,63 @@
-#!/bin/sh -e
+#!/bin/bash -e
+
+CIV_PATH=/opt/civ/data/Release_Deb
+
+function is_civ_ready() {
+    for i in {0..9}; do
+        timeout 1 adb connect vsock:3:5555 && break
+    done
+
+    for i in {0..9}; do
+        if [ "$(adb -s vsock:3:5555 shell getprop sys.boot_completed)" == "1" ] ; then
+            return 0
+            break
+        fi
+        sleep 1
+    done
+
+    return -1
+}
+
+function launch_lg_input_client()
+{
+    # needs to set DISPLAY env for LG_B1_Client_input be able to
+    # start at boot.
+    export DISPLAY=:0
+    /opt/lg/bin/LG_B1_Client_input &
+}
+
+function balloon_civ()
+{
+    #Balloon guest memory to 2048M on boot
+    if [ ! -z ${ENABLE_CIV_BALLOON} ]; then
+         /opt/cfc/mwc/bin/balloon_guest.sh 2048
+    fi
+}
+
+function pause_civ()
+{
+    if [ -z "$(pidof mwc_launcher)" ] && [ -z "$(pgrep -ax adb | grep -v "fork-server")" ] && [ -z "$(pidof startapp)" ]; then
+        # Pause CiV
+        /opt/cfc/mwc/bin/pause_civ.sh
+    fi
+}
+
+#----------------- Main Process started from here --------------------
 
 sleep 10
-CIV_PATH=/opt/civ/data/Release_Deb
+
+is_civ_ready || exit -1
 
 ${CIV_PATH}/scripts/stream &
 
-# needs to set DISPLAY env for LG_B1_Client_input be able to
-# start at boot.
-export DISPLAY=:0
-/opt/lg/bin/LG_B1_Client_input &
+launch_lg_input_client
 
-# monitor share folder
-/bin/bash /etc/sharefolder_monitor.sh &
+/etc/sharefolder_monitor.sh &
 
-sleep 10
+balloon_civ
 
 /opt/lg/bin/LG_B1_Client_clipboard guestClipboard:enable=true &
 
-#Balloon guest memory to 2048M on boot
-if [ ! -z ${ENABLE_CIV_BALLOON} ]; then
-    /opt/cfc/mwc/bin/balloon_guest.sh 2048
-fi
-
-#wait for android ready
-sleep 20
-# Pause CiV
-if [ -z "$(pidof mwc_launcher)" ] && [ -z "$(pgrep -ax adb | grep -v "fork-server")" ]; then
-    /opt/cfc/mwc/bin/pause_civ.sh
-fi
+pause_civ
 
 exit 0

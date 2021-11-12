@@ -1,6 +1,8 @@
 #!/bin/bash
 
 NUM_PARAMS=$#
+FOLDER_1_UPDATE='adb -s vsock:3:5555 shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage/emulated/0/Download'
+FOLDER_2_UPDATE='adb -s vsock:3:5555 shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage/emulated/0/Pictures'
 
 if [ "$NUM_PARAMS" -lt "2" ];
 then
@@ -8,18 +10,16 @@ then
     exit 1
 fi
 
-# Resume CiV
-/opt/cfc/mwc/bin/resume_civ.sh
-
 num_start_app=`ps aux | grep startapp | grep -v grep | wc -l`
 
 if [ "$num_start_app" -lt "1" ];
 then
-    /opt/cfc/mwc/bin/resume_civ.sh
-    if [ "$(adb get-state | grep "device" | awk '{print $1}')" != "device" ];
+    if ! systemctl --user is-active civ ;
     then
         /opt/lg/bin/startapp
     fi
+    # Resume CiV
+    /opt/cfc/mwc/bin/resume_civ.sh
 else
     exit 1
 fi
@@ -37,6 +37,8 @@ then
     previous_app=`/opt/cfc/mwc/bin/msg_agent localhost 3000 GET_APP_LASTOPENED | grep "appname" | grep -v grep | sed 's/^appname: *\(.*\),.*$/\1/g'`
 fi
 
+$FOLDER_1_UPDATE
+$FOLDER_2_UPDATE
 /opt/cfc/mwc/bin/mwc_launcher localhost 3000 $@
 
 echo "appname:$1, previous_app:$previous_app"
