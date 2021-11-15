@@ -39,6 +39,8 @@ function pause_civ()
     if [ -z "$(pidof mwc_launcher)" ] && [ -z "$(pgrep -ax adb | grep -v "fork-server")" ] && [ -z "$(pidof startapp)" ]; then
         # Pause CiV
         /opt/cfc/mwc/bin/pause_civ.sh
+        # Kill adb server for power saving
+        adb kill-server
     fi
 }
 
