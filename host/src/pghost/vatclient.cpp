@@ -258,6 +258,9 @@ int VatClient::HandleEventSingleLG(Event* event)
 	case EVENT_NOTIFY_LG_APP_CLOSED:
 	    running = 0;
 	    break;
+        case EVENT_CONNECTION_CLOSED:
+           running = 0;
+           break;
 	default:
 	    break;
     }
@@ -497,6 +500,7 @@ void VatClient::CleanUp()
     // Stop the instance and free the resources.
     m_launcherconnmgr->connDown();
     running = 0;
+    m_eventqueue->awaken();
     pthread_join (m_client_loop, NULL);
     delete m_eventqueue;
     delete m_launcherconnmgr;
