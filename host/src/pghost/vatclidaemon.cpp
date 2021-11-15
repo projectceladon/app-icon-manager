@@ -276,7 +276,24 @@ int main (int argc, char **argv)
                (!(epoll_events[i].events & EPOLLIN)))
             {
                 cout << "epoll error, i: " << i << " fd: " <<  epoll_events[i].data.fd << endl;
-                close(epoll_events[i].data.fd);
+                int data_error_fd = epoll_events[i].data.fd;
+                if (clients.find(data_error_fd) != clients.end()) {
+                    VatClient* vatclient = clients.at(data_error_fd);
+                    cout << "Remove the scoket fd: " << data_error_fd << " client: " << static_cast<void *> (vatclient) << endl;
+                    clients.erase(data_error_fd);
+                    vatclient->CleanUp();
+                    delete vatclient;
+                }
+                cout << "Remove the socket fd: " << data_error_fd << " from the epoll list." << endl;
+                int ret = epoll_ctl(epoll_fd, EPOLL_CTL_DEL, data_error_fd, NULL);
+                if (ret >= 0) {
+                    cout << "Removed the error socket fd from epoll: " << data_error_fd << endl;
+                }
+                else {
+                    cout << "Error to remove error scoket fd from epoll fds: " << data_error_fd << " return: " << ret << endl;
+                }
+                close (data_error_fd);
+
                 continue;
             }
             else if(listenfd == epoll_events[i].data.fd)

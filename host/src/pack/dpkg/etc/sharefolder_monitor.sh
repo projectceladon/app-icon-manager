@@ -3,8 +3,8 @@
 MONITOR_FOLDER_1=$HOME"/Android/Download"
 MONITOR_FOLDER_2=$HOME"/Android/Pictures"
 
-FOLDER_1_UPDATE='adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage/emulated/0/Download'
-FOLDER_2_UPDATE='adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage/emulated/0/Pictures'
+FOLDER_1_UPDATE='adb -s vsock:3:5555 shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage/emulated/0/Download'
+FOLDER_2_UPDATE='adb -s vsock:3:5555 shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage/emulated/0/Pictures'
 
 
 function folder_notify() {

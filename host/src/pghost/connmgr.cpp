@@ -219,6 +219,7 @@ void* Connmgr::conn_loop (void* data)
 	    // TODO: broadcast the socket closed message.
 	    cout << "Read from socket returns: " << read_counts << ", close the connection." << endl;
 	    connmgr->running = 0;
+            connmgr->NotifyConnectionClose();
 	}
     }
     return 0;
