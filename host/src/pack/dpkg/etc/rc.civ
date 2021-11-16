@@ -25,6 +25,19 @@ then
        sed -i "s%/home/kylin/civ/.userdata/username.img%${HOME}/.userdata/${USER}.img%g" $HOME/.intel/.civ/penguin-peak.ini
        sed -i "s%/home/kylin/Android/Pictures%${HOME}/Android/Pictures%g" $HOME/.intel/.civ/penguin-peak.ini
        sed -i "s%/home/kylin/Android/Download%${HOME}/Android/Download%g" $HOME/.intel/.civ/penguin-peak.ini
+
+       SYS_MEM_SIZE=`cat /proc/meminfo | grep MemTotal | grep -v grep | awk '{print $2}'`
+       SYS_MEM_SIZE_G=$((SYS_MEM_SIZE/1024/1024))
+       # It may smaller than the real memory size since some reserved
+       # memory not exposed to OS.
+       if [ "$SYS_MEM_SIZE_G" -le "8" ];
+       then
+           echo "Macine with ~ 8G memory loaded, allocate 3G system memory to AVM."
+           sed -i "s%^size=4G$%size=3G%g" $HOME/.intel/.civ/penguin-peak.ini
+       else
+           # the size=4G is the default configuration in penguin-peak.ini, do nothing.
+           echo "Machine with large than 8G memory loaded, do nothing."
+       fi
    fi
 
    if [ ! -d $HOME/.userdata ]
