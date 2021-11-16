@@ -52,9 +52,23 @@ then
         echo "Close previous opened app: $previous_app"
         /opt/cfc/mwc/bin/resume_civ.sh
         adb -s vsock:3:5555 shell am force-stop $previous_app
+        adb -s vsock:3:5555 shell am kill $previous_app
     else
         echo "Open same app, do nothing."
     fi
+fi
+
+if [ "$1" =  "com.xes.jazhanghui.activity" ];
+then
+    xersi_proc_num=`adb -s vsock:3:5555 shell ps -A | grep "com.xes.jazhanghui.activity" | awk -F ' ' {'print $2'} | wc -l`
+    if [ $xersi_proc_num -eq  1 ];
+    then
+       xersicore_pid=`adb -s vsock:3:5555 shell ps -A | grep "com.xes.jazhanghui.activity:core" | awk -F ' ' {'print $2'} `
+       if [ $xersicore_pid -ge 0 ];
+       then
+           adb -s vsock:3:5555 shell kill -9 $xersicore_pid
+       fi
+   fi
 fi
 
 # Balloon Guest memory to 2048MB if no mwc_launcher live
