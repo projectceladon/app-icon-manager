@@ -7,7 +7,7 @@ function is_civ_ready() {
         timeout 1 adb connect vsock:3:5555 && break
     done
 
-    for i in {0..9}; do
+    for i in {0..19}; do
         if [ "$(adb -s vsock:3:5555 shell getprop sys.boot_completed)" == "1" ] ; then
             return 0
             break
