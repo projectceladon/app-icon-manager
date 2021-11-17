@@ -6,6 +6,7 @@ ConditionPathExists=/opt/civ
 
 [Service]
 Type=simple
+ExecStartPre=/etc/rc.civ.pre start
 ExecStart=/etc/rc.civ start
 ExecStartPost=/etc/rc.civ.post start
 ExecStop=/etc/civ.stop.sh

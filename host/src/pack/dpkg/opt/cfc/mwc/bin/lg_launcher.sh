@@ -10,6 +10,17 @@ then
     exit 1
 fi
 
+# It's observed that the LG_B1_Clinet_input will be killed when user logout.
+# Needs to restart civ if this happens to ensure all required services are
+# up and running
+num_lg_input=`ps aux | grep LG_B1_Client_input | grep -v grep | wc -l`
+
+if [ "$num_lg_input" -lt "1" ];
+then
+    systemctl --user stop civ
+    systemctl --user start civ &
+fi
+
 num_start_app=`ps aux | grep startapp | grep -v grep | wc -l`
 
 if [ "$num_start_app" -lt "1" ];
@@ -20,6 +31,7 @@ then
     fi
     # Resume CiV
     /opt/cfc/mwc/bin/resume_civ.sh
+    adb connect vsock:3:5555
 else
     exit 1
 fi
