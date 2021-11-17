@@ -52,7 +52,8 @@ is_civ_ready || exit -1
 
 ${CIV_PATH}/scripts/stream &
 
-launch_lg_input_client
+# LG_B1_Client_input will be launched in rc.civ.pre
+#launch_lg_input_client
 
 /etc/sharefolder_monitor.sh &
 
