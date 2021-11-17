@@ -1,0 +1,18 @@
+#!/bin/sh -e
+
+while true
+do
+    if pgrep -u `whoami` -x "ukui-session" > /dev/null
+    then
+        break
+    else
+        sleep 1
+    fi
+done
+sleep 10
+export DISPLAY=:0
+THEUSER=$(users | awk '{print $1;}')
+LOGPATH=/home/$THEUSER/.userdata
+/opt/lg/bin/LG_B1_Client_input > $LOGPATH/LG_INPUT.log 2>&1 &
+
+exit 0
