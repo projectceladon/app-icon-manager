@@ -24,6 +24,28 @@ then
 fi
 
 
+function wait_bootcomplete() {
+  for i in {1..12}; do
+    boot_complete=`adb -s vsock:3:5555 shell getprop dev.bootcomplete`
+    if [[ "$boot_complete" -ge "1" ]];
+    then
+      echo "adb is $boot_complete when $i"
+      cuptime=`adb shell cat /proc/uptime | cut -d "." -f 1`
+      if [[ "$cuptime" -lt "12" ]];
+      then
+        echo "adb is $cuptime when $i"
+        sleep 1
+      else
+        adb -s vsock:3:5555 shell cat /proc/uptime
+        break
+      fi
+    else
+      sleep 1
+    fi
+  done
+}
+
+wait_bootcomplete
 adb -s vsock:3:5555 shell am start -n $2 --display 0
 
 num_lg_insts=`ps aux | grep LG_B1_Client.*looking-glass | grep -v guestClipboard.*enable.*true | grep -v grep | wc -l`

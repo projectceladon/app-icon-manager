@@ -66,6 +66,7 @@ class AdbProxy : public AmInterface {
 
   bool runShellCmd(const char* cmd);
   bool runCmd(const char* cmd);
+  bool installApp(const char* cmd);
   int  getAndroidVersion();
  protected:
   bool getDeviceName();
