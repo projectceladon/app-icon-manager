@@ -28,6 +28,9 @@ function launch_lg_input_client()
 
 function balloon_civ()
 {
+    #Balloon guest memory to 3G on boot
+    /opt/cfc/mwc/bin/balloon_guest.sh 3072
+
     #Balloon guest memory to 2048M on boot
     if [ ! -z ${ENABLE_CIV_BALLOON} ]; then
          /opt/cfc/mwc/bin/balloon_guest.sh 2048
