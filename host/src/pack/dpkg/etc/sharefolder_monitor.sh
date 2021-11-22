@@ -12,8 +12,8 @@ function folder_notify() {
 }
 
 function check_all_when_first_run() {
-    chmod -R o+rx $MONITOR_FOLDER_1
-    chmod -R o+rx $MONITOR_FOLDER_2
+    chmod -R o+rwx $MONITOR_FOLDER_1
+    chmod -R o+rwx $MONITOR_FOLDER_2
     $FOLDER_1_UPDATE
     $FOLDER_2_UPDATE
 }
@@ -24,8 +24,8 @@ folder_notify | while read -r line
 do
     echo $line
     if [[ "$line" =~ "CREATE" ]] || [[ "$line" =~ "MOVED_TO" ]];then
-        chmod -R o+rx $MONITOR_FOLDER_1
-        chmod -R o+rx $MONITOR_FOLDER_2
+        chmod -R o+rwx $MONITOR_FOLDER_1
+        chmod -R o+rwx $MONITOR_FOLDER_2
     fi
 
     $FOLDER_1_UPDATE < /dev/null
