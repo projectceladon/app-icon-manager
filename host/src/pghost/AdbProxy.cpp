@@ -127,6 +127,10 @@ int AdbProxy::getAndroidVersion() {
 
   int android_version = 10;
 
+  // always try to reconnect since the adb might be killed by other process.
+  if (!connect())
+      return -1;
+
   FILE* pf = popen(msgAndroidVerison, "r");
 
   if (pf) {
@@ -192,6 +196,7 @@ bool AdbProxy::getDeviceName() {
 bool AdbProxy::connect() {
   CLOGV("%s", __func__);
 
+  system("/opt/cfc/mwc/bin/resume_civ.sh");
   if (getDeviceName())
     return true;
 
@@ -216,9 +221,9 @@ bool AdbProxy::connect() {
 bool AdbProxy::runShellCmd(const char* cmd) {
   CLOGV("%s", __func__);
 
-  if (!mConnected) {
-    connect();
-  }
+  // always try to reconnect since the adb might be killed by other process.
+  if (!connect())
+      return false;
 
   snprintf(mMsgBuf, kMsgBufSize, "adb -s %s shell %s", mDeviceName.c_str(),
            cmd);
@@ -245,9 +250,10 @@ bool AdbProxy::installApp(const char* cmd) {
   CLOGV("%s", __func__);
 
   bool ret = false;
-  if (!mConnected) {
-    connect();
-  }
+
+  // always try to reconnect since the adb might be killed by other process.
+  if (!connect())
+      return false;
 
   snprintf(mMsgBuf, kMsgBufSize, "adb -s %s %s", mDeviceName.c_str(),
            cmd);
@@ -277,9 +283,9 @@ bool AdbProxy::installApp(const char* cmd) {
 bool AdbProxy::runCmd(const char* cmd) {
   CLOGV("%s", __func__);
 
-  if (!mConnected) {
-    connect();
-  }
+  // always try to reconnect since the adb might be killed by other process.
+  if (!connect())
+      return false;
 
   snprintf(mMsgBuf, kMsgBufSize, "adb -s %s %s", mDeviceName.c_str(),
            cmd);
@@ -306,9 +312,9 @@ bool AdbProxy::runCmd(const char* cmd) {
 bool AdbProxy::runShell(const char* cmd) {
   CLOGV("%s", __func__);
 
-  if (!mConnected) {
-    connect();
-  }
+  // always try to reconnect since the adb might be killed by other process.
+  if (!connect())
+      return false;
 
   snprintf(mMsgBuf, kMsgBufSize, "adb -s %s shell %s", mDeviceName.c_str(),
            cmd);
