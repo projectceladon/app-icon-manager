@@ -12,6 +12,7 @@ ExecStartPost=/etc/rc.civ.post start
 ExecStop=/etc/civ.stop.sh
 ExecStopPost=/etc/civ.stop.post.sh
 TimeoutSec=0
+TimeoutStopSec=3
 RemainAfterExit=no
 Restart=no
 RestartSec=3

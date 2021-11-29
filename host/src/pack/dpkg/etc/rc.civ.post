@@ -40,7 +40,11 @@ function pause_civ()
         # Pause CiV
         /opt/cfc/mwc/bin/pause_civ.sh
         # Kill adb server for power saving
-        adb kill-server
+        # Check the running environment again to avoid race condition considering
+        # pause_civ.sh might be blocked a while already.
+        if [ -z "$(pidof mwc_launcher)" ] && [ -z "$(pgrep -ax adb | grep -v "fork-server")" ] && [ -z "$(pidof startapp)" ]; then
+            adb kill-server
+        fi
     fi
 }
 
