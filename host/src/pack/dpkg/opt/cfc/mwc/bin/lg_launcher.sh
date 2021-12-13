@@ -91,9 +91,9 @@ if [ ! -z ${ENABLE_CIV_BALLOON} ]; then
 fi
 
 # Pause CiV
-if [ -z "$(pidof mwc_launcher)" ] && [ -z "$(pidof LG_B1_Client)" ] && [ -z "$(pgrep -ax adb | grep -v "fork-server")" ]; then
-    /opt/cfc/mwc/bin/pause_civ.sh
-fi
+#if [ -z "$(pidof mwc_launcher)" ] && [ -z "$(pidof LG_B1_Client)" ] && [ -z "$(pgrep -ax adb | grep -v "fork-server")" ]; then
+#    /opt/cfc/mwc/bin/pause_civ.sh
+#fi
 
 exit 0
 

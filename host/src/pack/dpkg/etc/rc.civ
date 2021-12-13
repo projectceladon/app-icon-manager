@@ -1,15 +1,29 @@
 #!/bin/sh -e
 
 # Wait the ukui-session ready.
+#while true
+#do
+#    if pgrep -u `whoami` -x "ukui-session" > /dev/null
+#    then
+#        break
+#    else
+#        sleep 1
+#    fi
+#done
+
 while true
 do
-    if pgrep -u `whoami` -x "ukui-session" > /dev/null
-    then
-        break
-    else
-        sleep 1
-    fi
+
+  num_session_process=`ps aux | grep "$USER.*gnome-session-binary.*--session=ubuntu" | grep -v grep | wc -l`
+  if [ $num_session_process -ge 1 ];
+  then
+          break
+  else
+          sleep 1
+  fi
 done
+
+sleep 5
 
 CIV_PATH=/opt/civ/data/Release_Deb
 
