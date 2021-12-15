@@ -336,9 +336,9 @@ bool ShortcutMgrLg::uninstallApp(const char* pkg) {
     // refresh the installed app list
     char cmdbuf[256];
     snprintf (cmdbuf, sizeof(cmdbuf), "uninstall %s", pkg);
-    m_adbproxy_->runCmd(cmdbuf);
+    bool ret = m_adbproxy_->runCmd(cmdbuf);
     updateInstalledApps();
-    return 0;
+    return ret;
 }
 
 bool ShortcutMgrLg::installApp(char* filename)

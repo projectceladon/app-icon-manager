@@ -94,9 +94,8 @@ bool uninstall_app(char* pkgname)
 {
     std::string m_pkgname = pkgname;
     ShortcutMgrLg* scMgr = ShortcutMgrLg::getShortcutMgrLg();
-    scMgr->uninstallApp(pkgname);
-
-    return true;
+    bool ret = scMgr->uninstallApp(pkgname);
+    return ret;
 }
 
 /***********************************************************
