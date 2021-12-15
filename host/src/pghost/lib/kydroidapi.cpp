@@ -71,9 +71,13 @@ bool install_app(char *filename, char *appname, char *pkgname)
     std::string m_appname = appname;
     std::string m_pkgname = pkgname;
     ShortcutMgrLg* scMgr = ShortcutMgrLg::getShortcutMgrLg();
-    scMgr->installApp(filename);
-
-    return true;
+    bool ret =  scMgr->installApp(filename);
+    if (true == ret) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 /***********************************************************
