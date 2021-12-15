@@ -1,13 +1,52 @@
-cp ../pghost/mwc dpkg/opt/cfc/mwc/bin/mwc
-cp ../pghost/mwc_hostdaemon dpkg/opt/cfc/mwc/bin/mwc_hostdaemon
-cp ../pghost/mwc_launcher dpkg/opt/cfc/mwc/bin/mwc_launcher
-cp ../pghost/loadapp.sh dpkg/opt/cfc/mwc/bin/loadapp.sh
-cp ../pghost/killapp.sh dpkg/opt/cfc/mwc/bin/killapp.sh
-cp ../pghost/closeapp.sh dpkg/opt/cfc/mwc/bin/closeapp.sh
-cp ../pghost/api_test dpkg/opt/cfc/mwc/bin/api_test
-cp ../pghost/libkydroid.so dpkg/opt/cfc/mwc/lib/libkydroid.so
-cp ../pghost/msg_agent dpkg/opt/cfc/mwc/bin/msg_agent
-cp ../pghost/kill_app_process.sh dpkg/opt/cfc/mwc/bin/kill_app_process.sh
-cp ../pghost/check_android_running.sh dpkg/opt/cfc/mwc/bin/check_android_running.sh
+#!/bin/bash
+
+if [[ -f ../pghost/mwc ]];
+then
+    cp ../pghost/mwc dpkg/opt/cfc/mwc/bin/mwc
+    echo "Copied mwc file for debian file packaging."
+else
+    echo "mwc not found, please execute the source compiling first!"
+fi
+
+if [[ -f ../pghost/mwc_hostdaemon ]];
+then
+    cp ../pghost/mwc_hostdaemon dpkg/opt/cfc/mwc/bin/mwc_hostdaemon
+    echo "Copied mwc_hostdaemon file for debian file packaging."
+else
+    echo "mwc_hostdaemon not found, please execute the source compiling first!"
+fi
+
+if [[ -f ../pghost/mwc_launcher ]];
+then
+    cp ../pghost/mwc_launcher dpkg/opt/cfc/mwc/bin/mwc_launcher
+    echo "Copied mwc_launcer file for debian file packagng."
+else
+    echo "mwc_launcher not foud, please execute the source compiling first!"
+fi
+
+if [[ -f ../pghost/api_test ]];
+then
+    cp ../pghost/api_test dpkg/opt/cfc/mwc/bin/api_test
+    echo "Copied api_test file for debian file packagng."
+else
+    echo "api_test not foud, please execute the source compiling first!"
+fi
+
+if [[ -f ../pghost/libkydroid.so ]];
+then
+    cp ../pghost/libkydroid.so dpkg/opt/cfc/mwc/lib/libkydroid.so
+    echo "Copied libkydroid.so file for debian file packagng."
+else
+    echo "libkydroid.so not foud, please execute the source compiling first!"
+fi
+
+if [[ -f ../pghost/msg_agent ]];
+then
+    cp ../pghost/msg_agent dpkg/opt/cfc/mwc/bin/msg_agent
+    echo "Copied msg_agent file for debian file packagng."
+else
+    echo "msg_agent not foud, please execute the source compiling first!"
+fi
+
 dpkg -b dpkg cfc-0.1.0-x64.deb
 
