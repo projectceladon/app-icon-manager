@@ -68,4 +68,10 @@ function pause_civ()
 }
 
 connect_qmp || exit -1
-pause_civ || exit -1
+if [ -z "$(pidof mwc_launcher)" ] && [ -z "$(pgrep -ax adb | grep -v "fork-server")" ] && [ -z "$(pidof startapp)" ]; then
+    echo "Try to pause civ ..."
+    pause_civ || exit -1
+    echo "Pause CIV executed."
+else
+    echo "LG client is running, skip the civ pause."
+fi

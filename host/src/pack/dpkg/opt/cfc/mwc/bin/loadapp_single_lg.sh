@@ -17,6 +17,8 @@ then
     exit 1
 fi
 
+/opt/cfc/mwc/bin/resume_civ.sh
+
 num_adb_devices=`adb devices | grep vsock.*device | grep -v grep | wc -l`
 if [[ "$num_adb_devices" -lt "1" ]];
 then
