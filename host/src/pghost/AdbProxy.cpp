@@ -241,6 +241,39 @@ bool AdbProxy::runShellCmd(const char* cmd) {
   return true;
 }
 
+bool AdbProxy::installApp(const char* cmd) {
+  CLOGV("%s", __func__);
+
+  bool ret = false;
+  if (!mConnected) {
+    connect();
+  }
+
+  snprintf(mMsgBuf, kMsgBufSize, "adb -s %s %s", mDeviceName.c_str(),
+           cmd);
+  CLOGD("%s", mMsgBuf);
+
+  FILE* pf = popen(mMsgBuf, "r");
+  if (pf) {
+    while (!feof(pf) && fgets(mMsgBuf, kMsgBufSize, pf)) {
+      if (strstr(mMsgBuf, msgErrorBroken) || strstr(mMsgBuf, msgErrorOffline)) {
+        mConnected = false;
+        ret = false;
+        break;
+      }
+      if (strstr(mMsgBuf, "Success")) {
+        ret = true;
+        break;
+      }
+    }
+    pclose(pf);
+  } else {
+    CLOGE("Failed to run cmd %s, error=%d(%s)\n", cmd, errno, strerror(errno));
+    ret = false;
+  }
+  return ret;
+}
+
 bool AdbProxy::runCmd(const char* cmd) {
   CLOGV("%s", __func__);
 

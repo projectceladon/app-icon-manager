@@ -347,6 +347,7 @@ bool ShortcutMgrLg::installApp(char* filename)
     char options[64];
     memset(options, 0, sizeof(options));
     bool has_options = false;
+    bool app_installed = false;
     //WA classin app needs to be run in 32bit mode.
     if (strstr(filename, "classin")) {
         snprintf(options, sizeof(options), "%s", "--abi armeabi-v7a ");
@@ -403,13 +404,13 @@ bool ShortcutMgrLg::installApp(char* filename)
 	}
     }
     if (apk_file_checked) {
-        m_adbproxy_->runCmd(cmdbuf);
+        app_installed = m_adbproxy_->installApp(cmdbuf);
         updateInstalledApps();
     }
     else {
         cout << "Apk file: " << filename << " is not installed!" << endl;
     }
-    return 0;
+    return app_installed;
 }
 
 int ShortcutMgrLg::getAndroidVersion()
