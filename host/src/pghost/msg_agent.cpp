@@ -103,8 +103,10 @@ int main(int argc, char **argv)
                     client->setAppName (appname);
                     client->setPkgName (pkgname);
                     client->setCliCommParams (lg_daemon_server, port);
-                    client->Init();
-                    client->closeApp();
+                    ret = client->Init();
+		    if (ret >=0) {
+                        ret = client->closeApp();
+		    }
                     ret = client->getResult();
                     client->Destroy();
                     delete client;
@@ -117,6 +119,10 @@ int main(int argc, char **argv)
                     client->setEndMode (MODE_AUTOEXIT);
                     client->setCliCommParams (lg_daemon_server, port);
                     ret = client->Init();
+		    if (argc > 4) {
+                        char* lg_slot_id = argv[4];
+                        client->setLgSlotId(lg_slot_id);
+                    }
                     if (ret >=0) {
                         // for daemon service to update launched app record.
                         ret = client->closeAppLastOpened();

@@ -143,7 +143,12 @@ int LGClient::loadApp()
         snprintf (cmd, sizeof(cmd), "/opt/cfc/mwc/bin/loadapp_single_lg.sh \"%s\" \"%s\" \"%s\" \"%s\"", m_appname, m_activity, lg_instance_id, "安卓应用");
     }
 #else
-    snprintf (cmd, sizeof(cmd), "/opt/cfc/mwc/bin/loadapp.sh %s %s %s", m_appname, m_activity, lg_instance_id);
+    if (m_app_icon_label.length() > 0) {
+        snprintf (cmd, sizeof(cmd), "/opt/cfc/mwc/bin/loadapp.sh %s %s %s %s", m_appname, m_activity, lg_instance_id, m_app_icon_label.c_str());
+    }
+    else {
+        snprintf (cmd, sizeof(cmd), "/opt/cfc/mwc/bin/loadapp.sh %s %s %s %s", m_appname, m_activity, lg_instance_id, "安卓应用");
+    }
 #endif
     printf("cmd: %s\n", cmd);
     system (cmd);
@@ -190,6 +195,11 @@ void LGClient::setPkgName (char* pkgname)
     snprintf(m_pkgname, sizeof(m_pkgname), "%s", pkgname);
 }
 
+void LGClient::setLgSlotId(char* lgslotid)
+{
+    snprintf(lg_instance_id, sizeof(lg_instance_id), "%s", lgslotid);
+}
+
 void LGClient::setAppIconLabel(char* appiconlabel)
 {
     printf("LGClient::setAppIconLabel, appiconlable:%s\n", appiconlabel);
@@ -221,7 +231,7 @@ int LGClient::Launch()
     }
 
     char lgapp_body[256];
-    snprintf (lgapp_body, sizeof(lgapp_body), "{appname=%s,activity=%s,};", m_appname, m_activity);
+    snprintf (lgapp_body, sizeof(lgapp_body), "{appname=%s,appactivity=%s,};", m_appname, m_activity);
     char msg_body[512];
     compose_msg_body(msg_body, sizeof(msg_body), EVENT_REQ_CHECK_IF_APP_LAUNCHED, lgapp_body);
     m_connmgr->sendMsg (msg_body, (int) sizeof(msg_body));
@@ -291,7 +301,7 @@ int LGClient::HandleEvent(Event* event)
 		// instance is available. If app is not launched and no idle LG instance
 		// the EVENT_RES_IDLE_LG_SLOT_NOT_AVAILABLE event should be returned.
                 char lgapp_body[256];
-                snprintf (lgapp_body, sizeof(lgapp_body), "{appname=%s,activity=%s,};", m_appname, m_activity);
+                snprintf (lgapp_body, sizeof(lgapp_body), "{appname=%s,appactivity=%s,};", m_appname, m_activity);
                 char msg_body[512];
                 compose_msg_body(msg_body, sizeof(msg_body), EVENT_REQ_GET_IDLE_LG_SLOT, lgapp_body);
                 m_connmgr->sendMsg (msg_body, (int) sizeof(msg_body));
@@ -387,7 +397,16 @@ int LGClient::HandleEvent(Event* event)
 	case EVENT_RES_NO_APP_LAST_OPENED:
 	    running = 0;
 	    result = -1;
+	    break;
+	case EVENT_RES_UNKNOWN_EVENT:
+	    running = 0;
+	    result = -1;
+	    break;
 	default:
+	    // Server sends the unknow event to client
+	    // close the client by default to avoid stale connection.
+	    running = 0;
+	    result = -1;
 	    break;
     }
 

@@ -59,6 +59,7 @@ event_map_t event_maps[] = {
     {"EVENT_REQ_GET_APP_LAST_OPENED",              EVENT_REQ_GET_APP_LAST_OPENED},
     {"EVENT_RES_GET_APP_LAST_OPENED",              EVENT_RES_GET_APP_LAST_OPENED},
     {"EVENT_CONNECTION_CLOSED",                    EVENT_CONNECTION_CLOSED},
+    {"EVENT_RES_UNKNOWN_EVENT",                    EVENT_RES_UNKNOWN_EVENT},
 };
 
 char* get_event_name_by_id(int event)
@@ -153,7 +154,8 @@ int get_key_value (char* src, char* key, char* ret_buf, char* kv_separtor, char*
     char* pos_value_start = pos_key + len_key + 1;
     char* pos_value_end = NULL;
 
-    pos_value_end = strstr(pos_key, key_separator);
+    //pos_value_end = strstr(pos_key, key_separator);
+    pos_value_end = strstr(pos_value_start, key_separator);
 
     if (NULL == pos_value_end) {
 	printf ("Cound't find the separator: %s\n", key_separator);

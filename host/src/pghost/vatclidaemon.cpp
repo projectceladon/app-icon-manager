@@ -85,8 +85,8 @@ static int HandleEvent(global_data_t* gdata, Event* event) {
 		    if (strstr(vatclient->getAppname(),appname)) {
 			if (strstr(g_lg_slots[0]->appname, appname) && g_lg_slots[0]->slot_status != LGSLOT_IDLE) {
 			    g_lg_slots[0]->slot_status = LGSLOT_IDLE;
-			    memset(g_lg_slots[0]->appname, sizeof(g_lg_slots[0]->appname), 0);
-			    memset(g_lg_slots[0]->activity, sizeof(g_lg_slots[0]->activity), 0);
+			    memset(g_lg_slots[0]->appname, 0, sizeof(g_lg_slots[0]->appname));
+			    memset(g_lg_slots[0]->activity, 0, sizeof(g_lg_slots[0]->activity));
 			}
                         vatclient->Close();
 			break;
@@ -128,6 +128,13 @@ static int HandleEvent(global_data_t* gdata, Event* event) {
 			break;
 		    }
 		    it++;
+	        }
+		if (lg_slot < NUM_LG_SLOTS) {
+		    if (strstr(g_lg_slots[lg_slot]->activity, activity) && g_lg_slots[lg_slot]->slot_status != LGSLOT_IDLE) {
+			g_lg_slots[lg_slot]->slot_status = LGSLOT_IDLE;
+			memset(g_lg_slots[lg_slot]->appname, 0, sizeof(g_lg_slots[lg_slot]->appname));
+			memset(g_lg_slots[lg_slot]->activity,0, sizeof(g_lg_slots[lg_slot]->activity));
+		    }
 	        }
 	    }
             break;
