@@ -45,6 +45,7 @@ class LGClient
 	void setAppName(char* appname);
         void setActivity(char* activity);
 	void setPkgName(char* pkgname);
+	void setLgSlotId(char* lgslotid);
 	void setAppIconLabel(char* appiconlabel);
 	// send the close app message to daemon and let the daemon
 	// to notify the registered client.

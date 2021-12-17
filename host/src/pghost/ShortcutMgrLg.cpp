@@ -209,7 +209,7 @@ bool ShortcutMgrLg::launchApp(char* pkgname, bool fullscreen, int width, int hei
 #else
     if (0 == fork()) {
         //child
-	snprintf(cmdbuf, sizeof(cmdbuf), "/opt/cfc/mwc/bin/lg_launcher.sh %s %s", pkgname, intent.c_str());
+	snprintf(cmdbuf, sizeof(cmdbuf), "/opt/cfc/mwc/bin/lg_launcher.sh %s %s", pkgname, intent.c_str(), app_icon_label.c_str());
 	system(cmdbuf);
 	exit(0);
     }

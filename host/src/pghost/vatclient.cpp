@@ -311,11 +311,13 @@ int VatClient::HandleEvent(Event* event)
     char lgslot_body[64];
     int lg_slot = -1;
     char app_close_body[256];
+    char app_last_opened[256];
+
     switch (event->event_type)
     {
 	case EVENT_REQ_CHECK_IF_APP_LAUNCHED:
 	    get_key_value (event->event_data + 1,
-		    (char*) "activity",
+		    (char*) "appactivity",
 		    activity,
 		    (char*) "=",
 		    (char*) ",");
@@ -390,7 +392,7 @@ int VatClient::HandleEvent(Event* event)
 	    break;
 	case EVENT_REQ_SET_LG_SLOT_APP_BUNDLE:
 	    get_key_value (event->event_data + 1,
-		    (char*) "activity",
+		    (char*) "appactivity",
 		    activity,
 		    (char*) "=",
 		    (char*) ",");
@@ -447,6 +449,31 @@ int VatClient::HandleEvent(Event* event)
 
 	    running = 0;
 	    break;
+	case EVENT_REQ_CLOSE_APP_LAST_OPENED:
+	   get_key_value (event->event_data + 1,
+		    (char*) "lg_instance_id",
+		    lg_instance_id,
+		    (char*) "=",
+		    (char*) ",");
+	    lg_slot = atoi(lg_instance_id);
+	    if (lg_slot < NUM_LG_SLOTS) {
+	        if (m_lg_slots[lg_slot]->slot_status != LGSLOT_USED) {
+                    snprintf(app_last_opened, sizeof(app_last_opened), "{lg_instance_id=%d;};", -1);
+                    compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_NO_APP_LAST_OPENED, app_last_opened);
+                    m_launcherconnmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+	        }
+	        else {
+                    snprintf(app_last_opened, sizeof(app_last_opened), "{appname=%s,appactivity=%s,};", m_lg_slots[lg_slot]->appname, m_lg_slots[lg_slot]->activity);
+                    compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_CLOSE_APP_LAST_OPENED, app_last_opened);
+                    m_launcherconnmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+                    // Compose the global message.
+                    snprintf(app_close_body, sizeof(app_close_body), "{appname=%s,lg_instance_id=%d,};", m_lg_slots[lg_slot]->appname, lg_slot);
+                    compose_msg_body(msg_body, sizeof(msg_body), EVENT_NOTIFY_APP_CLOSE_BY_APPNAME, app_close_body);
+                    EnQueueGlobalEvt (msg_body);
+	        }
+	    }
+            running = 0;
+            break;
 
 	case EVENT_NOTIFY_LG_APP_CLOSED:
 	    get_key_value (event->event_data + 1,
@@ -457,10 +484,24 @@ int VatClient::HandleEvent(Event* event)
 	    lg_slot = atoi(lg_instance_id);
 	    if (lg_slot < NUM_LG_SLOTS) {
 		m_lg_slots[lg_slot]->slot_status = LGSLOT_IDLE;
+		memset(m_lg_slots[lg_slot]->appname, 0, sizeof(m_lg_slots[lg_slot]->appname));
+                memset(m_lg_slots[lg_slot]->activity, 0, sizeof(m_lg_slots[lg_slot]->activity));
 	    }
 	    running = 0;
 	    break;
 	default:
+            /*
+	     * If unknown event sent to server, server sendback the error message to client.
+	     * Client needs to exit by default after got the event EVENT_RES_UNKNOWN_EVENT.
+	     * The closed client will trigger the socket read 0 size event in server. Server
+	     * then could do the graceful shutdown accordingly.
+	     */
+	    {
+		snprintf (lgslot_body, sizeof(lgslot_body), "{Error, unknown event sent to daemon!};");
+		char msg_body[512];
+		compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_UNKNOWN_EVENT, lgslot_body);
+		m_launcherconnmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+	    }
 	    break;
     }
 

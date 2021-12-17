@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#LG_SINGLE_INST_MODE="1"
+
 NUM_PARAMS=$#
 FOLDER_1_UPDATE='adb -s vsock:3:5555 shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage/emulated/0/Download'
 FOLDER_2_UPDATE='adb -s vsock:3:5555 shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE -d file:///storage/emulated/0/Pictures'
@@ -46,7 +48,12 @@ previous_app=""
 
 if [ ! "$num_lg_insts" -lt "1" ];
 then
-    previous_app=`/opt/cfc/mwc/bin/msg_agent localhost 3000 GET_APP_LASTOPENED | grep "appname" | grep -v grep | sed 's/^appname: *\(.*\),.*$/\1/g'`
+    if [ ! -z "$LG_SINGLE_INST_MODE" ];
+    then
+        previous_app=`/opt/cfc/mwc/bin/msg_agent localhost 3000 GET_APP_LASTOPENED | grep "appname" | grep -v grep | sed 's/^appname: *\(.*\),.*$/\1/g'`
+    else
+        echo "App will be closed after user closed Looking glass window in multiple window usage."
+    fi
 fi
 
 $FOLDER_1_UPDATE
