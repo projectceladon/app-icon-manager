@@ -12,6 +12,10 @@ do
     chmod 666 /dev/shm/looking-glass$i
 done
 
+echo "Start sleep-inhibitor service..."
+systemctl daemon-reload
+systemctl start sleep-inhibitor
+
 echo "Start mwc daemon service ..."
 /opt/cfc/mwc/bin/mwc_hostdaemon 3000
 exit 0
