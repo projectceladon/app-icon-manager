@@ -1,0 +1,17 @@
+#! /bin/sh
+if [ "$(systemctl --user is-active civ | grep -w 'active')" ] && [ "$(pidof mwc_launcher)" ] && [ "$(pidof LG_B1_Client)" ]
+then
+    if adb get-state 1>/dev/null 2>&1
+    then
+	state=$(adb shell dumpsys power | grep -oE 'SCREEN_BRIGHT_WAKE_LOCK')
+	if echo "$state" | grep 'SCREEN_BRIGHT_WAKE_LOCK'; then
+	    exit 254
+	else
+	    exit 0
+	fi
+    else
+	exit 0
+    fi
+else
+    exit 0
+fi
