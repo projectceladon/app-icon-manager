@@ -50,6 +50,7 @@ class LGClient
 	// send the close app message to daemon and let the daemon
 	// to notify the registered client.
 	int closeApp();
+	int crashApp();
 	int closeAppLastOpened();
         int getAppLastOpened();
 	char* getAppName();
@@ -78,6 +79,7 @@ class LGClient
         int      m_sock             = 0;
         EventQueue* m_event_queue   = NULL;
 	char     lg_instance_id[64];
+	char     kill_lg_process[64];
         char     m_activity[512];
 	char     m_appname[512];
 	char     m_pkgname[512];
