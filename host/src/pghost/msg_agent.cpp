@@ -40,12 +40,14 @@ typedef struct s_cmd_map {
 
 enum {
     CMD_CLOSEAPP,
+    CMD_CRASHAPP,
     CMD_CLOSEAPP_LASTOPENED,
     CMD_GET_APP_LASTOPENED
 };
 
 cmd_map_t cmd_maps[] = {
     {"CLOSEAPP",                  CMD_CLOSEAPP},
+    {"CRASHAPP",                  CMD_CRASHAPP},
     {"CLOSEAPP_LASTOPENED",       CMD_CLOSEAPP_LASTOPENED},
     {"GET_APP_LASTOPENED",        CMD_GET_APP_LASTOPENED},
 };
@@ -106,6 +108,25 @@ int main(int argc, char **argv)
                     ret = client->Init();
 		    if (ret >=0) {
                         ret = client->closeApp();
+		    }
+                    ret = client->getResult();
+                    client->Destroy();
+                    delete client;
+                }
+                break;
+            case CMD_CRASHAPP:
+                {
+                    char* appname            = argv[4];
+                    char* pkgname         = argv[5];
+                    int port = atoi (lg_daemon_port);
+                    LGClient* client = new LGClient();
+                    client->setEndMode (MODE_AUTOEXIT);
+                    client->setAppName (appname);
+                    client->setPkgName (pkgname);
+                    client->setCliCommParams (lg_daemon_server, port);
+                    ret = client->Init();
+		    if (ret >=0) {
+                        ret = client->crashApp();
 		    }
                     ret = client->getResult();
                     client->Destroy();

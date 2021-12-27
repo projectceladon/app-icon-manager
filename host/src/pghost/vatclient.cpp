@@ -164,6 +164,7 @@ int VatClient::HandleEventSingleLG(Event* event)
     memset(msg_body, 0, sizeof(msg_body));
 
     int idle_slot = -1;
+    int kill_lg_process = -1;
 
     char lgslot_body[64];
     char app_close_body[256];
@@ -202,6 +203,26 @@ int VatClient::HandleEventSingleLG(Event* event)
 	    m_lg_slots[0]->slot_status = LGSLOT_USED;
 	    snprintf(m_lg_slots[0]->appname, sizeof(m_lg_slots[0]->appname), "%s", appname);
 	    snprintf(m_lg_slots[0]->activity, sizeof(m_lg_slots[0]->activity), "%s", activity);
+	    break;
+	case EVENT_REQ_APP_CRASH_BY_APPNAME:
+	    {
+		get_key_value (event->event_data + 1,
+			(char*) "appname",
+			appname,
+			(char*) "=",
+			(char*) ",");
+                if (strstr(m_lg_slots[0]->appname, appname) && m_lg_slots[0]->slot_status != LGSLOT_IDLE) {
+                            m_lg_slots[0]->slot_status = LGSLOT_IDLE;
+                            memset(m_lg_slots[0]->appname, 0, sizeof(m_lg_slots[0]->appname));
+                            memset(m_lg_slots[0]->activity, 0, sizeof(m_lg_slots[0]->activity));
+                            kill_lg_process = 1;
+                }
+		snprintf (lgslot_body, sizeof(lgslot_body), "{lg_instance_id=%d, kill_lg_process=%d,};", -1, kill_lg_process);
+		char msg_body[512];
+		compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_APP_CRASH_BY_APPNAME, lgslot_body);
+		m_launcherconnmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+	    }
+	    running = 0;
 	    break;
 	case EVENT_REQ_APP_CLOSE_BY_APPNAME:
 	    {
@@ -307,6 +328,7 @@ int VatClient::HandleEvent(Event* event)
 
     int slot_found = -1;
     int idle_slot = -1;
+    int kill_lg_process = -1;
 
     char lgslot_body[64];
     int lg_slot = -1;
@@ -416,6 +438,36 @@ int VatClient::HandleEvent(Event* event)
 	    for (int i=0; i<NUM_LG_SLOTS; i++) {
 		printf("slot:%d, status:%d, appname:%s, activity:%s\n", i, m_lg_slots[i]->slot_status, m_lg_slots[i]->appname, m_lg_slots[i]->activity);
 	    }
+	    break;
+	case EVENT_REQ_APP_CRASH_BY_APPNAME:
+	    get_key_value (event->event_data + 1,
+		    (char*) "appname",
+		    appname,
+		    (char*) "=",
+		    (char*) ",");
+	    // Check if the app to be killed has been running already
+	    for (int i=0; i<NUM_LG_SLOTS; i++) {
+		if (LGSLOT_USED == m_lg_slots[i]->slot_status) {
+		    char* launched_appname = m_lg_slots[i]->appname;
+		    if (strstr(launched_appname, appname)) {
+                        m_lg_slots[i]->slot_status = LGSLOT_IDLE;
+                        memset(m_lg_slots[i]->appname, 0, sizeof(m_lg_slots[i]->appname));
+                        memset(m_lg_slots[i]->activity, 0, sizeof(m_lg_slots[i]->activity));
+                        kill_lg_process = 1;
+			slot_found = i;
+			break;
+		    }
+		}
+	    }
+	    //if (slot_found > -1) {
+		// Send the slot of the launched app to client
+		snprintf (lgslot_body, sizeof(lgslot_body), "{lg_instance_id=%d, kill_lg_process=%d,};", slot_found, kill_lg_process);
+		char msg_body[512];
+		compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_APP_CRASH_BY_APPNAME, lgslot_body);
+		m_launcherconnmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+	    //}
+
+	    running = 0;
 	    break;
 	case EVENT_REQ_APP_CLOSE_BY_APPNAME:
 	    get_key_value (event->event_data + 1,
