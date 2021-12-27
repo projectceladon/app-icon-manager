@@ -253,6 +253,20 @@ int LGClient::closeApp()
 
 }
 
+int LGClient::crashApp()
+{
+    running = 1;
+    char lgapp_body[256];
+    snprintf (lgapp_body, sizeof(lgapp_body), "{appname=%s,pkgname=%s,};", m_appname, m_pkgname);
+    printf("lgapp_body = %s\n", lgapp_body);
+    char msg_body[512];
+    compose_msg_body(msg_body, sizeof(msg_body), EVENT_REQ_APP_CRASH_BY_APPNAME, lgapp_body);
+    printf("msg_body = %s\n", msg_body);
+    m_connmgr->sendMsg (msg_body, (int) sizeof(msg_body));
+    mainLoop();
+    return 0;
+}
+
 int LGClient::getAppLastOpened()
 {
     running = 1;
@@ -360,6 +374,28 @@ int LGClient::HandleEvent(Event* event)
 	    running = 0;
 	    result = 0;
 	    break;
+        case EVENT_RES_APP_CRASH_BY_APPNAME:
+	    printf("lgclient EVENT_RES_APP_CRASH_BY_APPNAME\n");
+	    {
+	    get_key_value (event->event_data + 1,
+                           (char*) "kill_lg_process",
+                           kill_lg_process,
+                           (char*) "=",
+                           (char*) ",");
+	    get_key_value (event->event_data + 1,
+                           (char*) "lg_instance_id",
+                           lg_instance_id,
+                           (char*) "=",
+                           (char*) ",");
+            if (atoi(kill_lg_process) > -1) {
+                char cmd[512];
+                snprintf (cmd, sizeof(cmd), "/opt/cfc/mwc/bin/kill_lg_instance.sh %s", lg_instance_id);
+                system(cmd);
+            }
+            }
+            running = 0;
+            result = 0;
+            break;
 	case EVENT_NOTIFY_APP_CLOSE_BY_APPNAME_NOTIFIED:
 	    printf ("lgclient EVENT_NOTIFY_APP_CLOSE_BY_APPNAME_NOTIFIED recieved\n");
 	    running = 0;
