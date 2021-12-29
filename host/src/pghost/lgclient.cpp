@@ -314,8 +314,15 @@ int LGClient::HandleEvent(Event* event)
 	    }
             break;
 	case EVENT_RES_IDLE_LG_SLOT_NOT_AVAILABLE:
+	    cout << "Recieved event: EVENT_RES_IDLE_LG_SLOT_NOT_AVAILABLE." << endl;
+	    {
+                std::string cmd = "/opt/lg/bin/LG_B1_Client -V true";
+                FILE *pin = popen(cmd.c_str(), "r");
+                int i = pclose(pin);
+            }
 	    running = 0;
 	    result = -1;
+            break;
 	case EVENT_CONNECTION_CLOSED:
 	    running = 0;
 	    result = -1;
