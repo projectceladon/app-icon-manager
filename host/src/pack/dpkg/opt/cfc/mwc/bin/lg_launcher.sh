@@ -29,7 +29,9 @@ if [ "$num_start_app" -lt "1" ];
 then
     if ! systemctl --user is-active civ ;
     then
-        /opt/lg/bin/startapp
+        flock -x /var/lock/civ_startapp.lock /opt/lg/bin/startapp
+        # startapp might spwan a adb server which will hold the lock even after startapp exit, kill the adb server here to release the lock
+        adb kill-server
     fi
     # Resume CiV
     /opt/cfc/mwc/bin/resume_civ.sh
@@ -96,6 +98,9 @@ if [ ! -z ${ENABLE_CIV_BALLOON} ]; then
         /opt/cfc/mwc/bin/balloon_guest.sh 2048
     fi
 fi
+
+# delay for guest to finish some tasks
+sleep 3
 
 # Pause CiV
 if [ -z "$(pidof mwc_launcher)" ] && [ -z "$(pidof LG_B1_Client)" ] && [ -z "$(pgrep -ax adb | grep -v "fork-server")" ]; then
