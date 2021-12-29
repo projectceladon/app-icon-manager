@@ -65,6 +65,6 @@ balloon_civ
 
 /opt/lg/bin/LG_B1_Client_clipboard guestClipboard:enable=true &
 
-pause_civ
+flock -n -x /var/lock/civ_startapp.lock pause_civ ||
 
 exit 0
