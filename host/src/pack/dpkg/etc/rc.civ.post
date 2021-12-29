@@ -15,7 +15,7 @@ function is_civ_ready() {
         sleep 1
     done
 
-    return -1
+    return 0
 }
 
 function launch_lg_input_client()
@@ -52,7 +52,7 @@ function pause_civ()
 
 sleep 10
 
-is_civ_ready || exit -1
+is_civ_ready
 
 ${CIV_PATH}/scripts/stream &
 
