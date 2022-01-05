@@ -143,6 +143,14 @@ static int dump_app_desktop_files ()
 		return -1;
 	    }
 
+	    String16 appversion;
+	    status = pma->getAppVersion(pkg, &appversion);
+	    if (!status.isOk()) {
+		printf("Failed to call getAppVersion, res=%s\n",
+			status.toString8().string());
+		return -1;
+	    }
+
 	    if (access(fapp_desktop_launcher.c_str(), F_OK) != 0) {
 
 		FILE* fp = fopen(fapp_desktop_launcher .c_str(), "wb");
@@ -153,6 +161,7 @@ static int dump_app_desktop_files ()
 		}
 
 		fprintf(fp, "[Desktop Entry]\n");
+                fprintf(fp, "Name=%s\n", String8(appname).string());
 		fprintf(fp, "Name[zh_CN]=%s\n", String8(appname).string());
 		fprintf(fp, "Comment=Android App %s\n", String8(pkg).string());
 		fprintf(fp, "Exec=/opt/cfc/mwc/bin/lg_launcher.sh %s %s %s\n",String8(pkg).string(), String8(intent).string(), String8(appname).string());
@@ -161,7 +170,7 @@ static int dump_app_desktop_files ()
 		fprintf(fp, "Terminal=false\n");
 		fprintf(fp, "Categories=Application\n");
 		fprintf(fp, "X-Desktop-File-Install-Version=0.24\n");
-
+                fprintf(fp, "APKVersion=%s\n", String8(appversion).string());
 		fclose(fp);
 
 	    }
