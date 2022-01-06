@@ -34,7 +34,7 @@ enum {LGSLOT_IDLE, LGSLOT_RESERVED, LGSLOT_USED};
 #ifdef LG_SINGLE_MODE
 #define NUM_LG_SLOTS 1
 #else
-#define NUM_LG_SLOTS 2
+#define NUM_LG_SLOTS 4
 #endif
 
 typedef struct lgslot_s {
