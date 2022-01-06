@@ -48,6 +48,18 @@ function wait_bootcomplete() {
 
 wait_bootcomplete
 
+function configure_wm_density()
+{
+    adb -s vsock:3:5555 shell wm density 440 -d 1
+    adb -s vsock:3:5555 shell wm density 440 -d 2
+    adb -s vsock:3:5555 shell wm density 440 -d 3
+    adb -s vsock:3:5555 shell wm size 1200x1920 -d 1
+    adb -s vsock:3:5555 shell wm size 1200x1920 -d 2
+    adb -s vsock:3:5555 shell wm size 1200x1920 -d 3
+}
+
+configure_wm_density
+
 adb -s vsock:3:5555 shell am start -n $2 --display $3
 
 if [[ $"NUM_PARAMS" -ge "4" ]];
