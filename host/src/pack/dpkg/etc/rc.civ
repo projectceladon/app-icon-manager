@@ -50,18 +50,6 @@ then
         mkdir -p $HOME/Android/Download -m 0777
     fi
 
-    if [ ! -L $HOME/桌面/拓展应用文件夹/微信图片 ]
-    then
-       mkdir -p $HOME/桌面/拓展应用文件夹
-       ln -s $HOME/Android/Pictures/WeiXin/ $HOME/桌面/拓展应用文件夹/微信图片
-    fi
-
-    if [ ! -L $HOME/桌面/拓展应用文件夹/微信下载 ]
-    then
-       mkdir -p $HOME/桌面/拓展应用文件夹
-       ln -s $HOME/Android/Download/WeiXin/ $HOME/桌面/拓展应用文件夹/微信下载
-    fi
-
     # the civ service is configured to be RemainAfterExit=no, so
     # make the process running in blocking mode
     vm-manager -b penguin-peak >> $TEMP_LOG
