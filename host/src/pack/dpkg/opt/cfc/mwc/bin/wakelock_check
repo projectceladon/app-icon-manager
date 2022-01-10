@@ -1,0 +1,27 @@
+#! /bin/sh
+while true
+do
+    if [ $(adb get-state | grep -oE 'device') ] && [ $(pidof mwc_launcher) ] && [ $(pidof LG_B1_Client) ]
+    then
+        state=$(adb shell dumpsys power | grep -oE 'SCREEN_BRIGHT_WAKE_LOCK')
+        if echo "$state" | grep 'SCREEN_BRIGHT_WAKE_LOCK'; then
+	    if echo "$(gsettings get org.ukui.screensaver idle-activation-enabled)" | grep 'true'; then
+		set_by_script='true'
+	        echo "$(gsettings set org.ukui.screensaver idle-activation-enabled false)"
+	    fi
+        else
+	    if [ $set_by_script = 'true' ]
+	    then
+	        echo "$(gsettings reset org.ukui.screensaver idle-activation-enabled)"
+		set_by_script='false'
+	    fi
+        fi
+    else
+	if [ $set_by_script = 'true' ]
+	then
+            echo "$(gsettings reset org.ukui.screensaver idle-activation-enabled)"
+	    set_by_script='false'
+        fi
+    fi
+sleep 50
+done
