@@ -18,50 +18,56 @@ TEMP_LOG=$HOME/.civ.log
 echo -e "Start CIV daemon service ..." > $TEMP_LOG
 if [ -d $CIV_PATH ]
 then
-   if [ ! -f $HOME/.intel/.civ/penguin-peak.ini ]
-   then
-       mkdir -p $HOME/.intel/.civ/
-       cp /opt/cfc/mwc/bin/penguin-peak.ini $HOME/.intel/.civ/
-       sed -i "s%/home/kylin/civ/.userdata/username.img%${HOME}/.userdata/${USER}.img%g" $HOME/.intel/.civ/penguin-peak.ini
-       sed -i "s%/home/kylin/Android/Pictures%${HOME}/Android/Pictures%g" $HOME/.intel/.civ/penguin-peak.ini
-       sed -i "s%/home/kylin/Android/Download%${HOME}/Android/Download%g" $HOME/.intel/.civ/penguin-peak.ini
-   fi
+    if [ -f /opt/cfc/mwc/bin/wakelock_check ]
+    then
+	echo "Start wakelock check script" >> $TEMP_LOG
+        /opt/cfc/mwc/bin/wakelock_check &
+    fi
 
-   if [ ! -d $HOME/.userdata ]
-   then
-       mkdir -p $HOME/.userdata/
-       cp $CIV_PATH/userdata/civ_userdata.img $HOME/.userdata/${USER}.img
-   fi
+    if [ ! -f $HOME/.intel/.civ/penguin-peak.ini ]
+    then
+        mkdir -p $HOME/.intel/.civ/
+        cp /opt/cfc/mwc/bin/penguin-peak.ini $HOME/.intel/.civ/
+        sed -i "s%/home/kylin/civ/.userdata/username.img%${HOME}/.userdata/${USER}.img%g" $HOME/.intel/.civ/penguin-peak.ini
+        sed -i "s%/home/kylin/Android/Pictures%${HOME}/Android/Pictures%g" $HOME/.intel/.civ/penguin-peak.ini
+        sed -i "s%/home/kylin/Android/Download%${HOME}/Android/Download%g" $HOME/.intel/.civ/penguin-peak.ini
+    fi
+
+    if [ ! -d $HOME/.userdata ]
+    then
+        mkdir -p $HOME/.userdata/
+        cp $CIV_PATH/userdata/civ_userdata.img $HOME/.userdata/${USER}.img
+    fi
 
 
-   if [ ! -d $HOME/Android/Pictures ]
-   then
-       mkdir -p $HOME/Android/Pictures -m 0777
-   fi
+    if [ ! -d $HOME/Android/Pictures ]
+    then
+        mkdir -p $HOME/Android/Pictures -m 0777
+    fi
 
-   if [ ! -d $HOME/Android/Download ]
-   then
-       mkdir -p $HOME/Android/Download -m 0777
-   fi
+    if [ ! -d $HOME/Android/Download ]
+    then
+        mkdir -p $HOME/Android/Download -m 0777
+    fi
 
-   if [ ! -L $HOME/桌面/拓展应用文件夹/微信图片 ]
-   then
-      mkdir -p $HOME/桌面/拓展应用文件夹
-      ln -s $HOME/Android/Pictures/WeiXin/ $HOME/桌面/拓展应用文件夹/微信图片
-   fi
+    if [ ! -L $HOME/桌面/拓展应用文件夹/微信图片 ]
+    then
+       mkdir -p $HOME/桌面/拓展应用文件夹
+       ln -s $HOME/Android/Pictures/WeiXin/ $HOME/桌面/拓展应用文件夹/微信图片
+    fi
 
-   if [ ! -L $HOME/桌面/拓展应用文件夹/微信下载 ]
-   then
-      mkdir -p $HOME/桌面/拓展应用文件夹
-      ln -s $HOME/Android/Download/WeiXin/ $HOME/桌面/拓展应用文件夹/微信下载
-   fi
+    if [ ! -L $HOME/桌面/拓展应用文件夹/微信下载 ]
+    then
+       mkdir -p $HOME/桌面/拓展应用文件夹
+       ln -s $HOME/Android/Download/WeiXin/ $HOME/桌面/拓展应用文件夹/微信下载
+    fi
 
-   # the civ service is configured to be RemainAfterExit=no, so
-   # make the process running in blocking mode
-   vm-manager -b penguin-peak >> $TEMP_LOG
+    # the civ service is configured to be RemainAfterExit=no, so
+    # make the process running in blocking mode
+    vm-manager -b penguin-peak >> $TEMP_LOG
 else
-   echo "CIV instllation path is empty, skip!" >> $TEMP_LOG
-   exit 1
+    echo "CIV instllation path is empty, skip!" >> $TEMP_LOG
+    exit 1
 fi
 
 exit 0

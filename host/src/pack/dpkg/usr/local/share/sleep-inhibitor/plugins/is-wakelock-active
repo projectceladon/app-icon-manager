@@ -1,5 +1,5 @@
 #! /bin/sh
-if [ "$(systemctl --user is-active civ | grep -w 'active')" ] && [ "$(pidof mwc_launcher)" ] && [ "$(pidof LG_B1_Client)" ]
+if echo "$(systemctl --user is-active civ | grep -w 'active')" && [ "$(pidof mwc_launcher)" ] && [ "$(pidof LG_B1_Client)" ]
 then
     if adb get-state 1>/dev/null 2>&1
     then
