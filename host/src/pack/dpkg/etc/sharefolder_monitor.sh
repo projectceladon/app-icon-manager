@@ -5,7 +5,7 @@ MONITOR_FOLDER_2=$HOME"/Android/Pictures"
 
 INPUT=$(mktemp -u) || exit -1
 OUTPUT=$(mktemp -u) || exit -1
-QMP_PATH=$(realpath ~/.intel/.civ/.penguin-peak.qmp.unix.socket)
+QMP_PATH=$(realpath ~/.intel/.civ/.civ-1.qmp.unix.socket)
 
 function cleanup_tmp()
 {
