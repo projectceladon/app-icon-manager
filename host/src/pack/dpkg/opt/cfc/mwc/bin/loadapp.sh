@@ -62,11 +62,17 @@ configure_wm_density
 
 adb -s vsock:3:5555 shell am start -n $2 --display $3
 
+pos_x=`expr $3 \* 610 + 30`
+pos_y=30
+
+position="${pos_x}x${pos_y}"
+echo "position:$position"
+
 if [[ $"NUM_PARAMS" -ge "4" ]];
 then
-    /opt/lg/bin/LG_B1_Client -s false -M yes -R 16666 -f /dev/shm/looking-glass$3 -a true -t $4 -P $1
+    /opt/lg/bin/LG_B1_Client -s false -M yes -R 16666 -f /dev/shm/looking-glass$3 -a true -t $4 -P $1 win:position="$position"
 else
-    /opt/lg/bin/LG_B1_Client -s false -M yes -R 16666 -f /dev/shm/looking-glass$3 -a true -t "安卓应用"
+    /opt/lg/bin/LG_B1_Client -s false -M yes -R 16666 -f /dev/shm/looking-glass$3 -a true -t "安卓应用" win:position="$position"
 fi
 
 exit 0
