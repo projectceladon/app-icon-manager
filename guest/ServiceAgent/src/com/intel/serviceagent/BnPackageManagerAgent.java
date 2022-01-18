@@ -34,6 +34,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.AdaptiveIconDrawable;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -47,6 +48,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.Paint;
+import android.graphics.Bitmap.Config;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.PorterDuff.Mode;
 
 public class BnPackageManagerAgent extends IPackageManagerAgent.Stub {
     private static final String TAG = "ServiceAgent";
@@ -84,6 +92,34 @@ public class BnPackageManagerAgent extends IPackageManagerAgent.Stub {
                 drawable.getIntrinsicHeight());
         drawable.draw(canvas);
         return bitmap;
+    }
+
+    private static Bitmap generateRadiusCornerBM(Bitmap bm, int radius_num_pixel) {
+        // Grayscale color
+        final int gray_color = 0xff424242;
+        final Paint new_bm_paint = new Paint();
+        int bm_width = bm.getWidth();
+        int bm_height = bm.getHeight();
+        final Rect rect_bm = new Rect(0, 0, bm_width, bm_height);
+        final RectF rectF_bm = new RectF(rect_bm);
+        final float edge_pixels = radius_num_pixel * bm_width / 96;
+
+        Bitmap converted_bm = Bitmap.createBitmap(bm_width, bm_height, Config.ARGB_8888);
+        Canvas converted_canvas = new Canvas(converted_bm);
+
+        // Antialias is needed for smooth corner radius generation.
+        new_bm_paint.setAntiAlias(true);
+
+        // Set the transparent background.
+        converted_canvas.drawARGB(0, 0, 0, 0);
+
+        new_bm_paint.setColor(gray_color);
+        converted_canvas.drawRoundRect(rectF_bm, edge_pixels, edge_pixels, new_bm_paint);
+
+        new_bm_paint.setXfermode(new PorterDuffXfermode(Mode.SRC_IN));
+        converted_canvas.drawBitmap(bm, rect_bm, rect_bm, new_bm_paint);
+
+        return converted_bm;
     }
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -193,22 +229,64 @@ public class BnPackageManagerAgent extends IPackageManagerAgent.Stub {
 
     @Override
     public byte[] getIcon(String pkg) throws RemoteException {
-        Log.d(TAG, "getApplicationIcon");
-
+        Log.d(TAG, "Get lunch icon for app: " + pkg);
         try {
 
             ApplicationInfo appInfo =
                 mPm.getApplicationInfo(pkg, PackageManager.GET_META_DATA);
             Resources res = mPm.getResourcesForApplication(appInfo);
-            Drawable applicationIcon;
+            Drawable applicationIcon = null;
+
             try {
-                applicationIcon = res.getDrawableForDensity(appInfo.icon, DisplayMetrics.DENSITY_XHIGH, null);
-            } catch (Resources.NotFoundException e) {
-                Log.d(TAG, "getDrawableForDensity for: " + pkg + " raised Resource not found exception, try to call Packagemanger getApplicationIcon!");
-                applicationIcon = mPm.getApplicationIcon(pkg);
+                PackageInfo package_info = mPm.getPackageInfo(pkg, 0);
+                int display_configs[] = {DisplayMetrics.DENSITY_XHIGH, DisplayMetrics.DENSITY_HIGH, DisplayMetrics.DENSITY_MEDIUM, DisplayMetrics.DENSITY_XXXHIGH};
+                for (int display_config : display_configs) {
+                    try {
+                        applicationIcon = res.getDrawableForDensity(package_info.applicationInfo.icon, display_config);
+                        if (applicationIcon != null) {
+                            Log.d(TAG, "getDrawableForDensity for app: " + pkg + " returns the icon, display config: " + display_config);
+                            break;
+                        }
+                        else {
+                            Log.d(TAG, "getDrawableForDesnity for app: " + pkg + " returns null, display config: " + display_config);
+			}
+                    }
+                    catch (Resources.NotFoundException e) {
+                        Log.d(TAG, "ICON resource not found for" + pkg + " display conig: " + display_config);
+                        e.printStackTrace();
+                        continue;
+                    }
+                }
+            }
+            catch (Exception e) {
+                Log.d(TAG, "Failed to get Application package info: " + pkg);
+                e.printStackTrace();
             }
 
-            Bitmap bm = drawableToBitmap(applicationIcon);
+	    if (applicationIcon == null) {
+	        try {
+                   appInfo = mPm.getApplicationInfo(pkg, PackageManager.GET_META_DATA);
+                   Log.d(TAG, "getApplicationInfo for app: " + pkg + " returns normally.");
+                }
+                catch (PackageManager.NameNotFoundException e) {
+                   Log.d(TAG, "Failed to get Application info for app: " + pkg);
+                   e.printStackTrace();
+                   return null;
+	        }
+
+                applicationIcon = appInfo.loadIcon(mPm);
+	    }
+
+            Bitmap bm = null;
+            if (applicationIcon instanceof AdaptiveIconDrawable) {
+                Log.d(TAG, "Icon got for app: " + pkg + " is a AdaptiveIconDrawable");
+                bm = drawableToBitmap(applicationIcon);
+            }
+            else {
+                Log.d(TAG, "Icon got for app: " + pkg + " is not a AdaptiveIconDrawable");
+                Bitmap bm_origin = drawableToBitmap(applicationIcon);
+                bm = generateRadiusCornerBM(bm_origin, 8);
+            }
 
             // Use the fixed size 96*96 icon
             // TODO make it user configurable.
