@@ -84,9 +84,27 @@ function folder_notify() {
     inotifywait -rm -e create -e delete -e move $MONITOR_FOLDER_1 $MONITOR_FOLDER_2
 }
 
+function check_wechat_folder() {
+    if [[ ! -d $MONITOR_FOLDER_1"/WeChat" ]];then
+        mkdir -p $MONITOR_FOLDER_1"/WeChat"
+    fi
+    if [[ ! -d $MONITOR_FOLDER_1"/WeiXin" ]];then
+        mkdir -p $MONITOR_FOLDER_1"/WeiXin"
+    fi
+    if [[ ! -d $MONITOR_FOLDER_2"/WeChat" ]];then
+        mkdir -p $MONITOR_FOLDER_2"/WeChat"
+    fi
+    if [[ ! -d $MONITOR_FOLDER_2"/WeiXin" ]];then
+        mkdir -p $MONITOR_FOLDER_2"/WeiXin"
+    fi
+}
+
 function check_all_when_first_run() {
     chmod -R o+rwx $MONITOR_FOLDER_1
     chmod -R o+rwx $MONITOR_FOLDER_2
+
+    check_wechat_folder
+
     folder_update
 }
 
@@ -99,6 +117,11 @@ do
         chmod -R o+rwx $MONITOR_FOLDER_1
         chmod -R o+rwx $MONITOR_FOLDER_2
     fi
+
+    if [[ "$line" =~ "DELETE" ]] || [[ "$line" =~ "MOVED_FROM" ]];then
+        check_wechat_folder
+    fi
+
     folder_update
 
 done
