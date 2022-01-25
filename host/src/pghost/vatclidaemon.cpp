@@ -103,9 +103,9 @@ static int HandleEvent(global_data_t* gdata, Event* event) {
 }
 #else
 static int HandleEvent(global_data_t* gdata, Event* event) {
-    char activity[512];
+    char appname[512];
     char lg_instance_id[64];
-    memset(activity, 0, sizeof(activity));
+    memset(appname, 0, sizeof(appname));
     memset(lg_instance_id, 0, sizeof(lg_instance_id));
     int lg_slot = -1;
     cout <<"vatclidaemon::HandleEvent, event_data: " << event->event_data << endl;
@@ -129,8 +129,8 @@ static int HandleEvent(global_data_t* gdata, Event* event) {
 		    }
 		    it++;
 	        }
-		if (lg_slot < NUM_LG_SLOTS) {
-		    if (strstr(g_lg_slots[lg_slot]->activity, activity) && g_lg_slots[lg_slot]->slot_status != LGSLOT_IDLE) {
+		if (lg_slot >=0 && lg_slot < NUM_LG_SLOTS) {
+		    if (strstr(g_lg_slots[lg_slot]->appname, appname) && g_lg_slots[lg_slot]->slot_status != LGSLOT_IDLE) {
 			g_lg_slots[lg_slot]->slot_status = LGSLOT_IDLE;
 			memset(g_lg_slots[lg_slot]->appname, 0, sizeof(g_lg_slots[lg_slot]->appname));
 			memset(g_lg_slots[lg_slot]->activity,0, sizeof(g_lg_slots[lg_slot]->activity));
