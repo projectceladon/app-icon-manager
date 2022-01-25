@@ -534,7 +534,7 @@ int VatClient::HandleEvent(Event* event)
 		    (char*) "=",
 		    (char*) ";");
 	    lg_slot = atoi(lg_instance_id);
-	    if (lg_slot < NUM_LG_SLOTS) {
+	    if (lg_slot >=0 && lg_slot < NUM_LG_SLOTS) {
 		m_lg_slots[lg_slot]->slot_status = LGSLOT_IDLE;
 		memset(m_lg_slots[lg_slot]->appname, 0, sizeof(m_lg_slots[lg_slot]->appname));
                 memset(m_lg_slots[lg_slot]->activity, 0, sizeof(m_lg_slots[lg_slot]->activity));
@@ -597,5 +597,13 @@ void VatClient::CleanUp()
     pthread_join (m_client_loop, NULL);
     delete m_eventqueue;
     delete m_launcherconnmgr;
+
+    if (slot_id >=0 && slot_id < NUM_LG_SLOTS) {
+        if (LGSLOT_USED == m_lg_slots[slot_id]->slot_status) {
+            m_lg_slots[slot_id]->slot_status = LGSLOT_IDLE;
+            memset(m_lg_slots[slot_id]->appname, 0, sizeof(m_lg_slots[slot_id]->appname));
+            memset(m_lg_slots[slot_id]->activity, 0, sizeof(m_lg_slots[slot_id]->activity));
+	}
+    }
 }
 
