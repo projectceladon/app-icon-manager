@@ -60,7 +60,7 @@ function configure_wm_density()
 
 configure_wm_density
 
-adb -s vsock:3:5555 shell am start -n $2 --display $3
+adb -s vsock:3:5555 shell am start -W -S -n $2 --display $3 --activity-no-animation
 
 if [[ $"NUM_PARAMS" -ge "4" ]];
 then
