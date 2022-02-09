@@ -31,6 +31,8 @@ then
         sed -i "s%/home/kylin/civ/.userdata/username.img%${HOME}/.userdata/${USER}.img%g" $HOME/.intel/.civ/penguin-peak.ini
         sed -i "s%/home/kylin/Android/Pictures%${HOME}/Android/Pictures%g" $HOME/.intel/.civ/penguin-peak.ini
         sed -i "s%/home/kylin/Android/Download%${HOME}/Android/Download%g" $HOME/.intel/.civ/penguin-peak.ini
+        GUEST_SMBIOS_SERIAL=$(dmidecode -t 2 | grep -i serial | awk '{print $3}')
+	sed -i "s%SMBIOS_PLACEHOLDER%${GUEST_SMBIOS_SERIAL}%g" $HOME/.intel/.civ/penguin-peak.ini
     fi
 
     if [ ! -d $HOME/.userdata ]
