@@ -28,6 +28,7 @@ class EventQueue;
 class PipeMgr;
 class Event;
 class Connmgr;
+class LGSlot;
 
 #include "common.h"
 
@@ -42,6 +43,7 @@ class VatClient
 	void readAndParseEvt();
 	bool needRelease();
 	void set_lg_slots(lgslot_t** slots);
+	void set_lgslot_inst(LGSlot* lgslot);
 	int getLGSlotID();
 	void Close();
 	char* getAppname();
@@ -65,6 +67,7 @@ class VatClient
 	pthread_t    m_client_loop     = 0;
 	volatile int slot_id           = -1;
 	lgslot_t**   m_lg_slots        = NULL;
+	LGSlot*      m_lgslot          = NULL;
 	std::string  m_appname;
 	std::string  m_activity;
 };

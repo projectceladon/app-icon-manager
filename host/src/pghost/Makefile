@@ -22,7 +22,7 @@ all: mwc_launcher mwc_hostdaemon mwc libkydroid.so api_test msg_agent comm_host_
 
 
 MWCHOSTDAEMONSRCS = vatclidaemon.cpp connsock.cpp connfactory.cpp connmgr.cpp \
-               eventqueue.cpp utils.cpp vatclient.cpp
+               eventqueue.cpp utils.cpp vatclient.cpp lgslot.cpp
 
 MWCLAUNCHERSRCS = vatlauncher.cpp lgclient.cpp connfactory.cpp connmgr.cpp eventqueue.cpp \
           connsock.cpp utils.cpp ShortcutMgrLg.cpp Log.cpp AdbProxy.cpp
