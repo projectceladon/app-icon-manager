@@ -16,8 +16,10 @@ fi
 # Needs to restart civ if this happens to ensure all required services are
 # up and running
 num_lg_input=`ps aux | grep LG_B1_Client_input | grep -v grep | wc -l`
+num_start_app=`ps aux | grep startapp | grep -v grep | wc -l`
 
-if [ "$num_lg_input" -lt "1" ];
+# Check if startapp is already running to avoid stop/start too frequent.
+if [ "$num_lg_input" -lt "1" ] && [ "$num_start_app" -lt "1" ];
 then
     systemctl --user stop civ
     systemctl --user start civ &

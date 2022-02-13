@@ -41,6 +41,8 @@ Date: 2021.04.27
 #include "eventqueue.h"
 
 #include "vatclient.h"
+#include "lgslot.h"
+
 #define LISTENPORT 3001
 #define LISTENQ 8
 using namespace std;
@@ -62,6 +64,8 @@ lgslot_t*    g_lg_slots[1];
 #else
 lgslot_t*    g_lg_slots[4];
 #endif
+
+LGSlot* g_lgslot_inst = NULL;
 
 extern int get_key_value (char* src, char* key, char* ret_buf, char* kv_separtor, char* key_separator);
 #ifdef LG_SINGLE_MODE
@@ -129,14 +133,12 @@ static int HandleEvent(global_data_t* gdata, Event* event) {
 		    }
 		    it++;
 	        }
-		if (lg_slot >=0 && lg_slot < NUM_LG_SLOTS) {
-		    if (strstr(g_lg_slots[lg_slot]->appname, appname) && g_lg_slots[lg_slot]->slot_status != LGSLOT_IDLE) {
-			g_lg_slots[lg_slot]->slot_status = LGSLOT_IDLE;
-			memset(g_lg_slots[lg_slot]->appname, 0, sizeof(g_lg_slots[lg_slot]->appname));
-			memset(g_lg_slots[lg_slot]->activity,0, sizeof(g_lg_slots[lg_slot]->activity));
-		    }
-	        }
-	    }
+                if (lg_slot >=0 && lg_slot < NUM_LG_SLOTS) {
+                    if (strstr(g_lg_slots[lg_slot]->appname, appname) && g_lg_slots[lg_slot]->slot_status != LGSLOT_IDLE) {
+                        g_lgslot_inst->SetLGSlotIdle(lg_slot);
+                    }
+                }
+            }
             break;
 	default:
             break;
@@ -204,6 +206,13 @@ int main (int argc, char **argv)
 	    g_lg_slots[i] = p_lgslot;
 	}
     }
+    g_lgslot_inst = new LGSlot();
+    if (NULL == g_lgslot_inst) {
+        perror("Failed to create Looking Glass slot state management instance. Probably low memory situation, exit!");
+        exit(1);
+    }
+    g_lgslot_inst->SetLGSlots(g_lg_slots);
+
     g_data.eventqueue = new EventQueue();
     g_data.clients = &clients;
     g_data.running = 1;
@@ -350,6 +359,7 @@ int main (int argc, char **argv)
 		    vatclient->setLauncherCommSock(fd_req);
 		    vatclient->setGlobalEvtQueue (g_data.eventqueue);
 		    vatclient->set_lg_slots(g_lg_slots);
+		    vatclient->set_lgslot_inst(g_lgslot_inst);
 		    vatclient->Run();
 		    clients.emplace (fd_req, vatclient);
                 }
