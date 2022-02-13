@@ -9,7 +9,6 @@ then
 fi
 
 adb -s vsock:3:5555 shell am force-stop $1
-adb -s vsock:3:5555 shell am force-stop com.android.packageinstaller
 
 exit 0
 
