@@ -39,12 +39,13 @@ Date: 2021.04.27
 #include "common.h"
 
 #include "connmgr.h"
-
+#include "lgslot.h"
 
 using namespace std;
 
 VatClient::VatClient()
 {
+    slot_id = -1;
 }
 
 VatClient::~VatClient()
@@ -99,6 +100,11 @@ bool VatClient::needRelease() {
 void VatClient::set_lg_slots(lgslot_t** slots)
 {
     m_lg_slots = slots;
+}
+
+void VatClient::set_lgslot_inst(LGSlot* lgslot)
+{
+    m_lgslot = lgslot;
 }
 
 extern int get_event_id_by_name (char* evt_name);
@@ -359,8 +365,9 @@ int VatClient::HandleEvent(Event* event)
 	    }
 	    printf("slot_found: %d, idle_slot: %d\n", slot_found, idle_slot);
 	    if (slot_found > -1) {
-		slot_id = slot_found;
-		// Send the slot of the launched app to client
+                // Don't set slot_id in EVENT_REQ_CHECK_IF_APP_LAUNCHED, otherwise it may cause exisitng launched app state messed.
+                //slot_id = slot_found;
+                // Send the slot of the launched app to client
 		snprintf (lgslot_body, sizeof(lgslot_body), "{lg_instance_id=%d;}", slot_found);
 		char msg_body[512];
 		compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_CHECK_IF_APP_LAUNCHED, lgslot_body);
@@ -388,18 +395,10 @@ int VatClient::HandleEvent(Event* event)
 	    }
 	    break;
 	case EVENT_REQ_GET_IDLE_LG_SLOT:
-	    idle_slot = -1;
-	    for (int i=0; i<NUM_LG_SLOTS; i++) {
-		if (LGSLOT_IDLE == m_lg_slots[i]->slot_status) {
-		    printf("found one idle slot:%d and set the slot as reserved\n", i);
-		    idle_slot = i;
-		    slot_id = idle_slot;
-		    m_lg_slots[i]->slot_status = LGSLOT_RESERVED;
-		    break;
-		}
-	    }
+	    idle_slot = m_lgslot->ReserveOneLGSlot();
 	    printf("idle_slot:%d\n", idle_slot);
-	    if (idle_slot > -1) {
+	    if (idle_slot >=0 && idle_slot < NUM_LG_SLOTS) {
+		slot_id = idle_slot;
 		snprintf (lgslot_body, sizeof(lgslot_body), "{lg_instance_id=%d,};", idle_slot);
 		char msg_body[512];
 		compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_IDEL_LG_SLOT, lgslot_body);
@@ -429,11 +428,11 @@ int VatClient::HandleEvent(Event* event)
 		    (char*) "=",
 		    (char*) ",");
 	    lg_slot = atoi(lg_instance_id);
-	    if (lg_slot < NUM_LG_SLOTS) {
-		m_lg_slots[lg_slot]->slot_status = LGSLOT_USED;
-		slot_id = lg_slot;
-		snprintf(m_lg_slots[lg_slot]->appname, sizeof(m_lg_slots[lg_slot]->appname), "%s", appname);
-		snprintf(m_lg_slots[lg_slot]->activity, sizeof(m_lg_slots[lg_slot]->activity), "%s", activity);
+	    if (lg_slot < NUM_LG_SLOTS && lg_slot >=0) {
+		int ret = m_lgslot->BundleLGSlotApp(lg_slot, appname, activity);
+		if (ret >=0) {
+		    slot_id = lg_slot;
+		}
 	    }
 	    for (int i=0; i<NUM_LG_SLOTS; i++) {
 		printf("slot:%d, status:%d, appname:%s, activity:%s\n", i, m_lg_slots[i]->slot_status, m_lg_slots[i]->appname, m_lg_slots[i]->activity);
@@ -450,9 +449,7 @@ int VatClient::HandleEvent(Event* event)
 		if (LGSLOT_USED == m_lg_slots[i]->slot_status) {
 		    char* launched_appname = m_lg_slots[i]->appname;
 		    if (strstr(launched_appname, appname)) {
-                        m_lg_slots[i]->slot_status = LGSLOT_IDLE;
-                        memset(m_lg_slots[i]->appname, 0, sizeof(m_lg_slots[i]->appname));
-                        memset(m_lg_slots[i]->activity, 0, sizeof(m_lg_slots[i]->activity));
+                        m_lgslot->SetLGSlotIdle(i);
                         kill_lg_process = 1;
 			slot_found = i;
 			break;
@@ -535,9 +532,7 @@ int VatClient::HandleEvent(Event* event)
 		    (char*) ";");
 	    lg_slot = atoi(lg_instance_id);
 	    if (lg_slot >=0 && lg_slot < NUM_LG_SLOTS) {
-		m_lg_slots[lg_slot]->slot_status = LGSLOT_IDLE;
-		memset(m_lg_slots[lg_slot]->appname, 0, sizeof(m_lg_slots[lg_slot]->appname));
-                memset(m_lg_slots[lg_slot]->activity, 0, sizeof(m_lg_slots[lg_slot]->activity));
+		m_lgslot->SetLGSlotIdle(lg_slot);
 	    }
 	    running = 0;
 	    break;
@@ -600,9 +595,7 @@ void VatClient::CleanUp()
 
     if (slot_id >=0 && slot_id < NUM_LG_SLOTS) {
         if (LGSLOT_USED == m_lg_slots[slot_id]->slot_status) {
-            m_lg_slots[slot_id]->slot_status = LGSLOT_IDLE;
-            memset(m_lg_slots[slot_id]->appname, 0, sizeof(m_lg_slots[slot_id]->appname));
-            memset(m_lg_slots[slot_id]->activity, 0, sizeof(m_lg_slots[slot_id]->activity));
+	    m_lgslot->SetLGSlotIdle(slot_id);
 	}
     }
 }
