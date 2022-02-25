@@ -1,0 +1,16 @@
+#!/usr/bin/env python3
+
+# Inhibit Gnome-SessionManager screen off on idle
+
+import dbus
+import sys
+import time
+INHIBIT_IDLE    = 8
+max_time = 4294967295
+bus = dbus.SessionBus()
+
+session = bus.get_object(bus_name='org.gnome.SessionManager',
+            object_path='/org/gnome/SessionManager')
+session_interface = dbus.Interface(session, dbus_interface='org.gnome.SessionManager')
+session_interface.Inhibit("idle Inhibit", 0, "User requested blank screen inhibited in idle", INHIBIT_IDLE)
+time.sleep(max_time)
