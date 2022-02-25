@@ -21,7 +21,7 @@ then
     if [ -f /opt/cfc/mwc/bin/wakelock_check ]
     then
 	echo "Start wakelock check script" >> $TEMP_LOG
-        /opt/cfc/mwc/bin/wakelock_check &
+	/opt/cfc/mwc/bin/wakelock_check &
     fi
 
     if [ ! -f $HOME/.intel/.civ/penguin-peak.ini ]
