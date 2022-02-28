@@ -60,7 +60,12 @@ function configure_wm_density()
 
 configure_wm_density
 
-adb -s vsock:3:5555 shell am start -W -S -n $2 --display $3 --activity-no-animation
+if [ "$1" = "com.tencent.mm" ];
+then
+    adb -s vsock:3:5555 shell am start -W -S -n $2 --display $3 --activity-no-animation
+else
+    adb -s vsock:3:5555 shell am start -S -n $2 --display $3 --activity-no-animation
+fi
 
 if [[ $"NUM_PARAMS" -ge "4" ]];
 then

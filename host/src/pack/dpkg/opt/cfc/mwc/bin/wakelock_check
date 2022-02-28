@@ -1,30 +1,33 @@
 #! /bin/sh
+run_inhibit=0
 while true
 do
     if echo "$(systemctl --user is-active civ | grep -w 'active')" && [ "$(pidof mwc_launcher)" ] && [ "$(pidof LG_B1_Client)" ]
     then
-	if adb get-state 1>/dev/null 2>&1
-	then
-            state=$(adb shell dumpsys power | grep -oE 'SCREEN_BRIGHT_WAKE_LOCK')
-            if echo "$state" | grep 'SCREEN_BRIGHT_WAKE_LOCK'; then
-	        if echo "$(gsettings get org.ukui.screensaver idle-activation-enabled)" | grep 'true'; then
-		    set_by_script='true'
-	            echo "$(gsettings set org.ukui.screensaver idle-activation-enabled false)"
-	        fi
-            else
-	        if [ $set_by_script = 'true' ]
-	        then
-	            echo "$(gsettings reset org.ukui.screensaver idle-activation-enabled)"
-		    set_by_script='false'
-	        fi
-            fi
-        fi
+       if adb get-state 1>/dev/null 2>&1
+       then
+	   state=$(adb shell dumpsys power | grep -oE 'SCREEN_BRIGHT_WAKE_LOCK')
+	   if echo "$state" | grep 'SCREEN_BRIGHT_WAKE_LOCK'; then
+	       if [ $run_inhibit = 0 ]
+	       then
+		   python3 /opt/cfc/mwc/bin/inhibit_lock &
+		   run_inhibit=1
+		   proc_pid=$!
+	       fi
+	   else
+	       if [ $proc_pid ]; then
+		   kill $proc_pid
+		   unset proc_pid
+		   run_inhibit=0
+	       fi
+	   fi
+       fi
     else
-	if [ $set_by_script = 'true' ]
-	then
-            echo "$(gsettings reset org.ukui.screensaver idle-activation-enabled)"
-	    set_by_script='false'
-        fi
+       if [ $proc_pid ]; then
+	   kill $proc_pid
+	   unset proc_pid
+	   run_inhibit=0
+       fi
     fi
 sleep 50
 done
