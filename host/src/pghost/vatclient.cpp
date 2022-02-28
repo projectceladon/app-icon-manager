@@ -433,6 +433,9 @@ int VatClient::HandleEvent(Event* event)
 		if (ret >=0) {
 		    slot_id = lg_slot;
 		}
+                else {
+                    slot_id = -1;
+                }
 	    }
 	    for (int i=0; i<NUM_LG_SLOTS; i++) {
 		printf("slot:%d, status:%d, appname:%s, activity:%s\n", i, m_lg_slots[i]->slot_status, m_lg_slots[i]->appname, m_lg_slots[i]->activity);
@@ -449,7 +452,11 @@ int VatClient::HandleEvent(Event* event)
 		if (LGSLOT_USED == m_lg_slots[i]->slot_status) {
 		    char* launched_appname = m_lg_slots[i]->appname;
 		    if (strstr(launched_appname, appname)) {
-                        m_lgslot->SetLGSlotIdle(i);
+                        // Set the slot_id to -1 to avoid unexpected slot state update.
+                        slot_id = -1;
+                        // Don't set the slot to idle here. Let the process opened looking glass
+                        // to communicate with daemon for the graceful shutdown.
+                        // m_lgslot->SetLGSlotIdle(i);
                         kill_lg_process = 1;
 			slot_found = i;
 			break;
@@ -532,6 +539,7 @@ int VatClient::HandleEvent(Event* event)
 		    (char*) ";");
 	    lg_slot = atoi(lg_instance_id);
 	    if (lg_slot >=0 && lg_slot < NUM_LG_SLOTS) {
+                slot_id = -1;
 		m_lgslot->SetLGSlotIdle(lg_slot);
 	    }
 	    running = 0;
@@ -594,8 +602,9 @@ void VatClient::CleanUp()
     delete m_launcherconnmgr;
 
     if (slot_id >=0 && slot_id < NUM_LG_SLOTS) {
-        if (LGSLOT_USED == m_lg_slots[slot_id]->slot_status) {
+        if (LGSLOT_IDLE != m_lg_slots[slot_id]->slot_status) {
 	    m_lgslot->SetLGSlotIdle(slot_id);
+            slot_id = -1;
 	}
     }
 }
