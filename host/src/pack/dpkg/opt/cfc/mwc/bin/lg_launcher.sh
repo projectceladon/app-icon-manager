@@ -12,6 +12,14 @@ then
     exit 1
 fi
 
+num_lg_process=`ps aux | grep "lg_launcher.*$1 $2" | grep -v grep | wc -l`
+echo "num_lg_process:$num_lg_process"
+if [ "$num_lg_process" -ge "3" ];
+then
+    echo "The app launcher process is already running, skip the app launch!"
+    exit 0
+fi
+
 # It's observed that the LG_B1_Clinet_input will be killed when user logout.
 # Needs to restart civ if this happens to ensure all required services are
 # up and running
@@ -62,6 +70,14 @@ fi
 
 $FOLDER_1_UPDATE
 $FOLDER_2_UPDATE
+
+num_app_process=`ps aux | grep "mwc_launcher.* $1 $2" | grep -v grep | wc -l`
+if [ ! "$num_app_process" -lt "1" ];
+then
+    echo "The app process is already running, skip the app launch!"
+    exit 0
+fi
+
 /opt/cfc/mwc/bin/mwc_launcher localhost 3000 $@
 
 echo "appname:$1, previous_app:$previous_app"

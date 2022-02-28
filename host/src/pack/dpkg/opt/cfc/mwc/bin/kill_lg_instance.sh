@@ -18,7 +18,7 @@ else
    pid=`ps aux | grep "LG_B1_Client " | grep -v grep | grep $inst | awk '{print $2}'`
 fi
 
-if [ "$pid" -gt 0 ]
+if [ ! -z "$pid" ] && [ "$pid" -gt 0 ]
 then
     echo  "inside kill"	
     kill -KILL $pid
