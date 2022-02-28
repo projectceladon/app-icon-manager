@@ -60,6 +60,18 @@ function configure_wm_density()
 
 configure_wm_density
 
+# Kill the looking glass client with same slot id.
+# This is to avoid messed looking glass slot allocation status.
+lg_pids=`ps aux | grep "LG_B1_Client.*looking-glass$3" | grep -v grep | awk '{print $2}'`
+
+echo "Looking-glass client pid:$lg_pids"
+if [ ! -z "$lg_pids" ];
+then
+    echo "Kill looking-glass client pid: $lg_pids"
+    kill -KILL $lg_pids
+    sleep 1
+fi
+
 if [ "$1" = "com.tencent.mm" ];
 then
     adb -s vsock:3:5555 shell am start -W -S -n $2 --display $3 --activity-no-animation
