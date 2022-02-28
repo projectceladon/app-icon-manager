@@ -62,6 +62,14 @@ fi
 
 $FOLDER_1_UPDATE
 $FOLDER_2_UPDATE
+
+num_app_process=`ps aux | grep "mwc_launcher.* $1 $2" | grep -v grep | wc -l`
+if [ ! "$num_app_process" -lt "1" ];
+then
+    echo "The app process is already running, skip the app launch!"
+    exit 0
+fi
+
 /opt/cfc/mwc/bin/mwc_launcher localhost 3000 $@
 
 echo "appname:$1, previous_app:$previous_app"
