@@ -65,6 +65,12 @@ balloon_civ
 
 /opt/lg/bin/LG_B1_Client_clipboard guestClipboard:enable=true &
 
-flock -n -x /var/lock/civ_startapp.lock pause_civ ||
+sleep 20
+touch /var/lock/civ_startapp.lock
+exec {CIV_STARTAPP_LOCK_FD}</var/lock/civ_startapp.lock
+if flock -n -x ${CIV_STARTAPP_LOCK_FD} ; then
+    pause_civ
+fi
+exec {CIV_STARTAPP_LOCK_FD}<&-
 
 exit 0
