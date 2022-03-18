@@ -12,6 +12,12 @@ function cleanup_tmp()
     exec 6<&-
     exec 7>&-
 
+    for pid in $(jobs -r -p); do
+        # kill all child process of jobs, in case of child processes
+        # become child of systemd and unable to release resouces(e.g.: nc)
+        pkill -P $pid
+    done
+
     rm $INPUT
     rm $OUTPUT
 }
@@ -19,7 +25,7 @@ function cleanup_tmp()
 function connect_qmp() {
 
     local attempts=0
-    while ! nc -z -U "$QMP_PATH"; do
+    while ! timeout 1 nc -z -U "$QMP_PATH"; do
         sleep 0.1
         (( attempts++ ))
         if ((attempts == 100)); then
@@ -35,7 +41,7 @@ function connect_qmp() {
     exec 7< "$OUTPUT"
 
     local out
-    read -u 7 -r out;
+    read -u 7 -r out
     echo "Socket connected: $out"
     if ! grep -q "{.*QMP.*version.*qemu.*package.*capabilities.*}" <<< "$out"; then
         return -1
