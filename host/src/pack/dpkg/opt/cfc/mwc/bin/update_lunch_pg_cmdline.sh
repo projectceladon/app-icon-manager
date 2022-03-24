@@ -70,9 +70,4 @@ else
   done
 fi
 
-echo "Kill the process ukui-menu for it restart with updated app list..."
-
-ukui_menu_pid=`ps aux | grep ukui-menu | grep -v grep | awk '{print $2}'`
-kill -KILL $ukui_menu_pid
-
 echo "Android app lunch icon updating done."
