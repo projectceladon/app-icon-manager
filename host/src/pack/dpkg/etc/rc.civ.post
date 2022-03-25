@@ -65,9 +65,10 @@ balloon_civ
 
 /opt/lg/bin/LG_B1_Client_clipboard guestClipboard:enable=true &
 
+THEUSER=$(users | awk '{print $1;}')
 sleep 20
-touch /var/lock/civ_startapp.lock
-exec {CIV_STARTAPP_LOCK_FD}</var/lock/civ_startapp.lock
+touch /var/lock/civ_startapp_$THEUSER.lock
+exec {CIV_STARTAPP_LOCK_FD}</var/lock/civ_startapp_$THEUSER.lock
 if flock -n -x ${CIV_STARTAPP_LOCK_FD} ; then
     pause_civ
 fi

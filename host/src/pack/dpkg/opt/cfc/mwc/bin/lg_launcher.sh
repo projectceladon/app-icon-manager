@@ -26,12 +26,13 @@ then
 fi
 
 num_start_app=`ps aux | grep startapp | grep -v grep | wc -l`
+THEUSER=$(users | awk '{print $1;}')
 
 if [ "$num_start_app" -lt "1" ];
 then
     if ! systemctl --user is-active civ ;
     then
-        flock -x /var/lock/civ_startapp.lock /opt/lg/bin/startapp
+        flock -x /var/lock/civ_startapp_$THEUSER.lock /opt/lg/bin/startapp
         # startapp might spwan a adb server which will hold the lock even after startapp exit, kill the adb server here to release the lock
         adb kill-server
     fi
