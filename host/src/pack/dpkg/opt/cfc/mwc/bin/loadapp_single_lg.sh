@@ -65,7 +65,8 @@ then
     fi
     /opt/cfc/mwc/bin/msg_agent localhost 3000 CLOSEAPP_LASTOPENED
 else
-    /opt/lg/bin/LG_B1_Client -Q $1 -t $4
+    #/opt/lg/bin/LG_B1_Client -Q $1 -t $4
+    echo "Do nothing."
 fi
 
 exit 0
