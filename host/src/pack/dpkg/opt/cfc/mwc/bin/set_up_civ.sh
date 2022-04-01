@@ -96,6 +96,8 @@ function configure_civ_ini() {
 	sed -i "s%/home/kylin/Android/Pictures%${HOME}/Android/Pictures%g" $HOME/.intel/.civ/penguin-peak.ini
 	mkdir -p $HOME/Android/Download -m 0777
 	sed -i "s%/home/kylin/Android/Download%${HOME}/Android/Download%g" $HOME/.intel/.civ/penguin-peak.ini
+	GUEST_SMBIOS_SERIAL=$(sudo dmidecode -t 2 | grep -i serial | awk '{print $3}')
+	sed -i "s%SMBIOS_PLACEHOLDER%${GUEST_SMBIOS_SERIAL}%g" $HOME/.intel/.civ/penguin-peak.ini
 }
 
 function configure_civ_service(){
