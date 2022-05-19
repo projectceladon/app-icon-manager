@@ -52,26 +52,26 @@ function pause_civ()
 
 sleep 10
 
-is_civ_ready
+#is_civ_ready
 
 ${CIV_PATH}/scripts/stream &
 
 # LG_B1_Client_input will be launched in rc.civ.pre
 #launch_lg_input_client
 
-/etc/sharefolder_monitor.sh &
+#/etc/sharefolder_monitor.sh &
 
-balloon_civ
+#balloon_civ
 
 /opt/lg/bin/LG_B1_Client_clipboard guestClipboard:enable=true &
 
 THEUSER=$(users | awk '{print $1;}')
 sleep 20
 touch /var/lock/civ_startapp_$THEUSER.lock
-exec {CIV_STARTAPP_LOCK_FD}</var/lock/civ_startapp_$THEUSER.lock
-if flock -n -x ${CIV_STARTAPP_LOCK_FD} ; then
-    pause_civ
-fi
-exec {CIV_STARTAPP_LOCK_FD}<&-
+#exec {CIV_STARTAPP_LOCK_FD}</var/lock/civ_startapp_$THEUSER.lock
+#if flock -n -x ${CIV_STARTAPP_LOCK_FD} ; then
+#    pause_civ
+#fi
+#exec {CIV_STARTAPP_LOCK_FD}<&-
 
 exit 0
