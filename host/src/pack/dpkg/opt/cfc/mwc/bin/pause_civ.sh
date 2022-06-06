@@ -49,6 +49,13 @@ function connect_qmp()
         return -1
     fi
 }
+function toggle_status()
+{
+    echo "Send QMP: toggle-instance-status, value=0"
+    local out
+    echo "{ \"execute\": \"toggle-instance-status\", \"arguments\": { \"value\": 0 } }" >&4
+    read -u 5 -t 1 -r out && echo "OUTPUT: $out"
+}
 
 function pause_civ()
 {
@@ -69,6 +76,8 @@ function pause_civ()
 
 connect_qmp || exit -1
 if [ -z "$(pidof mwc_launcher)" ] && [ -z "$(pgrep -ax adb | grep -v "fork-server")" ] && [ -z "$(pidof startapp)" ]; then
+    echo "Try to toggle civ ..."
+    toggle_status || exit -1
     echo "Try to pause civ ..."
     pause_civ || exit -1
     echo "Pause CIV executed."

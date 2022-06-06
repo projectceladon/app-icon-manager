@@ -82,9 +82,9 @@ function resume_civ()
 
 function toggle_status()
 {
-    echo "Send QMP: toggle_instance_status, value=1"
+    echo "Send QMP: toggle-instance-status, value=1"
     local out
-    echo "{ \"execute\": \"toggle_instance_status\", \"arguments\": { \"value\": 1 } }" >&4
+    echo "{ \"execute\": \"toggle-instance-status\", \"arguments\": { \"value\": 1 } }" >&4
     read -u 5 -t 1 -r out && echo "OUTPUT: $out"
 }
 
