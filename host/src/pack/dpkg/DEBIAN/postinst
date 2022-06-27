@@ -6,5 +6,5 @@ udevadm trigger
 systemctl enable mwc
 systemctl start mwc.service
 
-systemctl enable commagent 
-systemctl start commagent 
+systemctl enable cfchostagent 
+systemctl start cfchostagent 

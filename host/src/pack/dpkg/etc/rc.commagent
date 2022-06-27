@@ -1,5 +1,0 @@
-#!/bin/sh -e
-
-echo "Start communication agent service ..."
-/opt/cfc/mwc/bin/comm_host_agent
-exit 0

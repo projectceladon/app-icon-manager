@@ -11,12 +11,10 @@ CC_FLAGS_KYDROIDAPI = -fPIC -shared -std=c++14 -fpermissive -g -ldl -lstdc++ -lj
 
 CC_FLAGS_KYDROIDTEST = -L. -I./include -std=c++14 -fpermissive -g -lstdc++ -lkydroid -ljsoncpp -I/usr/include/jsoncpp
 
-CC_FLAGS_COMM_HOST_AGENT = -std=c++11 -DMSG_SERVER -lpthread -I./vsock_comm_agent
-
 includes = $(wildcard *.h)
 
 #all: vatsev vatlauncher vatclidaemon
-all: mwc_launcher mwc_hostdaemon mwc libkydroid.so api_test msg_agent comm_host_agent
+all: mwc_launcher mwc_hostdaemon mwc libkydroid.so api_test msg_agent
 #all: mwc
 # ls *.cpp | grep -v "test_client.cpp" | sed '{ :ack; N; $! b ack; s/\n/ /g;}'
 
@@ -35,8 +33,6 @@ MWCSRC = mwc_main.cpp ShortcutMgrLg.cpp Log.cpp AdbProxy.cpp
 KYDROIDAPISRC = lib/kydroidapi.cpp ShortcutMgrLg.cpp Log.cpp AdbProxy.cpp
 
 API_TESTSRC = api_test.cpp
-
-COMM_HOST_AGENT_SRCS = vsock_comm_agent/vsock_comm_agent.cpp vsock_comm_agent/vsock_msg_dispatcher.cpp 	
 
 MWCLAUNCHEROBJS = $(MWCLAUNCHERSRCS:.cpp=.o)
 MWCHOSTDAEMONOBJS = $(MWCHOSTDAEMONSRCS:.cpp=.o)
@@ -63,11 +59,8 @@ api_test: $(API_TESTOBJS)
 msg_agent: $(MSG_AGENTOBJS)
 	$(CC) $(MSG_AGENTOBJS) -o $@ $(CC_FLAGS)
 
-comm_host_agent:
-	$(CC) $(COMM_HOST_AGENT_SRCS) $(CC_FLAGS_COMM_HOST_AGENT) -o $@
-
 %.o: %.cpp ${includes}
 	$(CC) -c $(CC_FLAGS) $< -o $@
 
 clean:
-	-rm -f mwc_launcher mwc_hostdaemon mwc libkydroid.so api_test msg_agent comm_host_agent $(MWCLAUNCHEROBJS) $(MWCHOSTDAEMONOBJS) $(MWCOBJS) $(KYDROIDAPIOBJS) $(API_TESTOBJS) $(MSG_AGENTOBJS)
+	-rm -f mwc_launcher mwc_hostdaemon mwc libkydroid.so api_test msg_agent $(MWCLAUNCHEROBJS) $(MWCHOSTDAEMONOBJS) $(MWCOBJS) $(KYDROIDAPIOBJS) $(API_TESTOBJS) $(MSG_AGENTOBJS)
