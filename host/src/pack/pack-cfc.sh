@@ -48,12 +48,11 @@ else
     echo "msg_agent not foud, please execute the source compiling first!"
 fi
 
-if [[ -f ../pghost/comm_host_agent ]];
+if [[ -d dpkg/opt/cfc/host_agent ]];
 then
-    cp ../pghost/comm_host_agent dpkg/opt/cfc/mwc/bin/comm_host_agent
-    echo "Copied comm_host_agent file for debian file packagng."
+    echo "cfc_host_agent is packaged as part of cfc.deb."
 else
-    echo "comm_host_agent not foud, please execute the source compiling first!"
+    echo "cfc_host_agent not found, please copy the files first!"
 fi
 dpkg -b dpkg cfc-0.1.0-x64.deb
 

@@ -1,0 +1,5 @@
+#!/bin/sh -e
+
+echo "Start communication agent service ..."
+LD_LIBRARY_PATH=/opt/cfc/host_agent/bin/ /opt/cfc/host_agent/bin/cfc_host_agent
+exit 0
