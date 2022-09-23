@@ -39,22 +39,34 @@ function flash_image(){
 	cd $CIV_DATA_DIR/Release_Deb/
 	cp /usr/share/qemu/OVMF.fd  .
 	./scripts/start_flash_usb.sh caas_dev-flashfiles-*.zip --display-off
-	mv -R $CIV_DATA_DIR/Release_Deb/userdata $HOME/.userdata
 
-	cd scripts/
-	sudo dpkg -r cfc
-	sudo dpkg --no-debsig -i cfc-0.1.0-x64.deb
+	if [ ! -d "$HOME/.userdata" ]; then
+		mkdir $HOME/.userdata
+		cp -R $CIV_DATA_DIR/Release_Deb/userdata/*.img $HOME/.userdata/${USER}.img
+	else
+		echo "Already has .userdata"
+	fi
+	chmod a+rw OVMF.fd android.qcow2
+	chmod a+rw aaf/mixins.spec
+	#cd scripts/
+	#sudo dpkg -r cfc
+	#sudo dpkg --no-debsig -i cfc-0.1.0-x64.deb
 }
 
 function install_vm-manager() {
 	local REL_URL=$(wget -q -nv -O- https://api.github.com/repos/projectceladon/vm_manager/releases/latest 2>/dev/null | jq -r '.assets[] | select(.browser_download_url | contains("ubuntu-20.04.deb")) | .browser_download_url')
 	if [ -z $REL_URL ]; then
-		echo "Failed to acquire latest release for vm-manager, Please download/install from https://github.com/projectceladon/vm_manager/releases/"
-		exit -1
+		echo "Trying to using local package..."
+		if [ -f $HOME/vm-manager_v0.4.1_ubuntu-20.04.deb ]; then
+			sudo dpkg --no-debsig -i $HOME/vm-manager_v0.4.1_ubuntu-20.04.deb
+		else
+			echo "Failed to acquire latest release for vm-manager, Please download/install from https://github.com/projectceladon/vm_manager/releases/"
+			exit -1
+		fi
+	else
+		wget -q -nv -O /tmp/$(basename $REL_URL) $REL_URL
+		sudo dpkg --no-debsig -i /tmp/$(basename $REL_URL)
 	fi
-
-	wget -q -nv -O /tmp/$(basename $REL_URL) $REL_URL
-	sudo dpkg --no-debsig -i /tmp/$(basename $REL_URL)
 	if [ $? -ne 0 ]; then
 		echo "Failed install vm-manager, Please download/install from https://github.com/projectceladon/vm_manager/releases/"
 		exit -1
@@ -63,26 +75,37 @@ function install_vm-manager() {
 
 function install_cfc() {
 	sudo dpkg -r cfc
-	sudo dpkg -i $CIV_DATA_DIR/Release_Deb/scripts/cfc-0.1.0-x64.deb
+	sudo dpkg -i --no-debsig $CIV_DATA_DIR/Release_Deb/scripts/cfc-0.1.0-x64.deb
 }
 
 function change_script(){
-	sudo dpkg --no-debsig -i $HOME/libsdl2-2.0-0_2.0.10+dfsg1-3_amd64.deb
-	sudo sed -i "s/\$1/\"教育应用\"/g" /opt/cfc/mwc/bin/loadapp_single_lg.sh
-	sudo cp /opt/lg/bin/LG_B1_Client /opt/lg/bin/LG_B1_Client_bak
-	sudo -E cp $HOME/LG_B1_Client /opt/lg/bin/LG_B1_Client
-	sudo chmod 755 /opt/lg/bin/LG_B1_Client
+	#sudo dpkg --no-debsig -i $HOME/libsdl2-2.0-0_2.0.10+dfsg1-3_amd64.deb
+	#sudo sed -i "s/\$1/\"教育应用\"/g" /opt/cfc/mwc/bin/loadapp_single_lg.sh
+	#sudo cp /opt/lg/bin/LG_B1_Client /opt/lg/bin/LG_B1_Client_bak
+	#sudo -E cp $HOME/LG_B1_Client /opt/lg/bin/LG_B1_Client
+	#sudo chmod 755 /opt/lg/bin/LG_B1_Client
+	sudo cp $HOME/pm_agent_client /opt/houdini/pm_agent_client
 }
 
 function configure_civ_ini() {
 	echo "Update config file($HOME/.intel/.civ/penguin-peak.ini) ..."
 	mkdir -p $HOME/.intel/.civ/ && cp /opt/cfc/mwc/bin/penguin-peak.ini $HOME/.intel/.civ/
+	sed -i "s%\/home\/kylin\/civ\/\.userdata\/username\.img%${HOME}\/\.userdata\/${USER}\.img%g" $HOME/.intel/.civ/penguin-peak.ini
 	sed -i "s%\/home\/kylin\/civ%${CIV_DATA_DIR}/Release_Deb%g" $HOME/.intel/.civ/penguin-peak.ini
-	sed -i "s%username%${USER}%g" ~/.intel/.civ/penguin-peak.ini
+	mkdir -p $HOME/Android/Pictures -m 0777
+	sed -i "s%/home/kylin/Android/Pictures%${HOME}/Android/Pictures%g" $HOME/.intel/.civ/penguin-peak.ini
+	mkdir -p $HOME/Android/Download -m 0777
+	sed -i "s%/home/kylin/Android/Download%${HOME}/Android/Download%g" $HOME/.intel/.civ/penguin-peak.ini
 }
 
 function configure_civ_service(){
+	[[ $(grep "CHANGED" /etc/rc.civ) == "CHANGED=true" ]] && echo "/etc/rc.civ already changed" && return 0
 	sudo sed -i "s%^CIV_PATH=.*$%CIV_PATH=${CIV_DATA_DIR}/Release_Deb%g" /etc/rc.civ
+	sudo sed -i '/civ.log/aTEMP_LOG=$HOME/\.civ.log\n' /etc/rc.civ
+	#add userdata if no exist
+	sudo sed -i '/then/aif [ ! -d $HOME/\.userdata ]\nthen\n  mkdir -p $HOME/\.userdata/ && cp -R $CIV_PATH/userdata/*.img $HOME/\.userdata/${USER}.img\nfi\n\#Adduser\n' /etc/rc.civ
+        sudo sed -i '/Adduser/aif [ ! -f $HOME/\.intel/\.civ/penguin-peak.ini ] \nthen\n  mkdir -p $HOME/\.intel/\.civ/ && cp /opt/cfc/mwc/bin/penguin-peak.ini $HOME/\.intel/\.civ/\n  sed -i "s%\/home\/kylin\/civ\/\.userdata\/username\.img%${HOME}\/\.userdata\/${USER}\.img%g" $HOME/.intel/.civ/penguin-peak.ini\n  sed -i "s%\/home\/kylin\/civ%${CIV_PATH}%g" $HOME/.intel/.civ/penguin-peak.ini\nfi\n' /etc/rc.civ
+	sudo sed -i '/Start CIV daemon/a CHANGED=true' /etc/rc.civ
 }
 
 function setup_houdini() {
@@ -97,16 +120,12 @@ function stop_civ_services() {
 	systemctl --user daemon-reload
 	systemctl --user stop civ
 	systemctl --user disable civ
-	systemctl --user stop clipboard
-	sudo systemctl --global disable clipboard
 }
 
 function start_civ_services() {
 	systemctl --user daemon-reload
 	systemctl --user enable civ
-	sudo systemctl --global enable clipboard
 	systemctl --user start civ
-	systemctl --user start clipboard
 }
 
 function wait_civ_adb_connect() {
