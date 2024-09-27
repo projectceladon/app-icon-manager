@@ -187,7 +187,7 @@ int VatClient::HandleEventSingleLG(Event* event)
 	    break;
 	case EVENT_REQ_SET_LG_SLOT_APP_BUNDLE:
 	    get_key_value (event->event_data + 1,
-		    (char*) "activity",
+		    (char*) "appactivity",
 		    activity,
 		    (char*) "=",
 		    (char*) ",");
@@ -230,7 +230,7 @@ int VatClient::HandleEventSingleLG(Event* event)
                 m_launcherconnmgr->sendMsg (msg_body, (int) sizeof(msg_body));
 	    }
 	    else {
-                snprintf(app_last_opened, sizeof(app_last_opened), "{appname=%s,activity=%s,};", m_lg_slots[0]->appname, m_lg_slots[0]->activity);
+                snprintf(app_last_opened, sizeof(app_last_opened), "{appname=%s,appactivity=%s,};", m_lg_slots[0]->appname, m_lg_slots[0]->activity);
                 compose_msg_body(msg_body, sizeof(msg_body), EVENT_RES_CLOSE_APP_LAST_OPENED, app_last_opened);
                 m_launcherconnmgr->sendMsg (msg_body, (int) sizeof(msg_body));
                 // Compose the global message.

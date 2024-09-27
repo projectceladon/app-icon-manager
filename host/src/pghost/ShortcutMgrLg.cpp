@@ -288,10 +288,23 @@ bool ShortcutMgrLg::uninstallApp(const char* pkg) {
 bool ShortcutMgrLg::installApp(char* filename)
 {
     char cmdbuf[512];
+    char options[64];
+    memset(options, 0, sizeof(options));
+    bool has_options = false;
+    //WA classin app needs to be run in 32bit mode.
+    if (strstr(filename, "classin")) {
+        snprintf(options, sizeof(options), "%s", "--abi armeabi-v7a ");
+        has_options = true;
+    }
     bool apk_file_checked = false;
     if (access(filename, F_OK) == 0) {
 	apk_file_checked = true;
-        snprintf(cmdbuf, sizeof(cmdbuf), "install %s", filename);
+        if (has_options) {
+            snprintf(cmdbuf, sizeof(cmdbuf), "install %s %s", options, filename);
+        }
+        else {
+            snprintf(cmdbuf, sizeof(cmdbuf), "install %s", filename);
+        }
     }
     else {
 	cout << "File: " << filename << " doesn't exist, try to find it in apk download folder ..." << endl;
@@ -306,14 +319,26 @@ bool ShortcutMgrLg::installApp(char* filename)
         snprintf(downloaded_apk, sizeof(downloaded_apk), apkDownloadPath.c_str(), v_uid, v_user_name, filename);
 	cout << "Check if file: " << downloaded_apk << " exists ..." << endl;
 	if (access(downloaded_apk, F_OK) ==0 ) {
-	    snprintf(cmdbuf, sizeof(cmdbuf), "install %s", downloaded_apk);
+            if (has_options) {
+                snprintf(cmdbuf, sizeof(cmdbuf), "install %s %s", options, downloaded_apk);
+            }
+            else {
+                snprintf(cmdbuf, sizeof(cmdbuf), "install %s", downloaded_apk);
+            }
+
 	    apk_file_checked = true;
 	}
 	else {
 	    snprintf(downloaded_apk, sizeof(downloaded_apk), apkCachePath.c_str(), v_home_dir, filename);
 	    cout << "Check if file: " << downloaded_apk << " exists ..." << endl;
 	    if (access(downloaded_apk, F_OK) ==0 ) {
-		snprintf(cmdbuf, sizeof(cmdbuf), "install %s", downloaded_apk);
+                if (has_options) {
+                    snprintf(cmdbuf, sizeof(cmdbuf), "install %s %s", options, downloaded_apk);
+                }
+                else {
+                    snprintf(cmdbuf, sizeof(cmdbuf), "install %s", downloaded_apk);
+                }
+
                 apk_file_checked = true;
 	    }
 	    else {
