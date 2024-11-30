@@ -12,6 +12,23 @@ do
     chmod 666 /dev/shm/looking-glass$i
 done
 
+echo "Set sleep-inhibitor if not already done..." >> /opt/cfc/mwc.log
+if [ ! -d /usr/local/share/sleep-inhibitor/plugins/is-wakelock-active ]
+then
+	cp /opt/cfc/mwc/bin/is-wakelock-active /usr/local/share/sleep-inhibitor/plugins/
+fi
+if [ ! -d /etc/sleep-inhibitor.conf ]
+then
+	cp /opt/cfc/mwc/bin/sleep-inhibitor.conf /etc/
+fi
+if [! -d /etc/systemd/system/sleep-inhibitor.service ]
+then
+	cp /etc/systemd/user/sleep-inhibitor.service /etc/systemd/system/
+fi
+
+systemctl daemon-reload
+systemctl start sleep-inhibitor
+
 echo "Start mwc daemon service ..." >> /opt/cfc/mwc.log
 /opt/cfc/mwc/bin/mwc_hostdaemon 3000 >> /opt/cfc/mwc.log
 exit 0
